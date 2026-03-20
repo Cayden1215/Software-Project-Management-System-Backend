@@ -53,7 +53,7 @@ public class ProjectController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<java.util.List<ProjectDto>> getAllProjects(@RequestParam Long pmID) {
+    public ResponseEntity<java.util.List<ProjectDto>> getAllProjects(@RequestBody Long pmID) {
         java.util.List<ProjectDto> projectDtos = projectService.getAllProjects(pmID);
         return ResponseEntity.ok(projectDtos);
     }
