@@ -6,6 +6,6 @@ import com.softwareprojectmanagement.backend.entities.Project;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    public java.util.List<Project> findByUserID(Long userID);
+    public java.util.List<Project> findByProjectManagerUserID(Long userID);
 
 }

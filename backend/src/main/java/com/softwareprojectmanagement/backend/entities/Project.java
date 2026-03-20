@@ -43,9 +43,10 @@ public class Project {
     @Column(name = "deadline")
     private LocalDate deadline;
 
-    @Column(name = "projectStatus")
+    @Column(name = "projectStatus", columnDefinition = "VARCHAR(255) DEFAULT 'Not Started'")
     private String projectStatus;
 
+    @ManyToOne
     @JoinColumn(name = "userID", nullable = false)
     private ProjectManager projectManager;
 

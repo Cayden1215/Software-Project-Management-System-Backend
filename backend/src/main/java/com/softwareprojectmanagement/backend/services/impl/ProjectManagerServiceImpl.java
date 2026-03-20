@@ -1,5 +1,6 @@
 package com.softwareprojectmanagement.backend.services.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.ProjectManagerDto;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProjectManagerServiceImpl implements ProjectManagerService {
 
+    @Autowired
     private ProjectManagerRepository projectManagerRepository;
 
     @Override
@@ -31,6 +33,11 @@ public class ProjectManagerServiceImpl implements ProjectManagerService {
     @Override
     public ProjectManagerDto updateProjectManager(Long id, ProjectManagerDto projectManagerDto) {
         ProjectManager projectManager = projectManagerRepository.findById(id).orElseThrow(() -> new RuntimeException("Project Manager not found"));
+
+        projectManager.setUsername(projectManagerDto.getUsername());
+        projectManager.setEmail(projectManagerDto.getEmail());
+        projectManager.setPassword(projectManagerDto.getPassword());
+        
         ProjectManager updatedProjectManager = projectManagerRepository.save(projectManager);
 
         return ProjectManagerMapper.mapToProjectManagerDto(updatedProjectManager);

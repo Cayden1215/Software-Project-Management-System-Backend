@@ -3,6 +3,7 @@ package com.softwareprojectmanagement.backend.services.impl;
 import java.util.List;
 
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.ProjectDto;
@@ -23,17 +24,23 @@ import lombok.AllArgsConstructor;
 @Service
 public class ProjectServiceImpl implements ProjectService{
 
+    @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
     private ProjectManagerRepository projectManagerRepository;
 
+    @Autowired
     private TeamMemberRepository teamMemberRepository;
+    
+    @Autowired
     private ProjectMemberRepository projectMemberRepository;
 
     @Override
     public ProjectDto createProject(ProjectDto projectDto) {
         ProjectManager projectManager = projectManagerRepository.findById(projectDto.getProjectManagerID()).orElseThrow(() -> new RuntimeException("Project Manager not found"));
         Project savedProject = ProjectMapper.mapToProject(projectDto, projectManager);
-        projectRepository.save(savedProject);
+        savedProject = projectRepository.save(savedProject);
         return ProjectMapper.mapToProjectDto(savedProject);
     }
 
@@ -45,7 +52,7 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public List<ProjectDto> getAllProjects(Long pmID){
-        List<Project> projects = projectRepository.findByUserID(pmID);
+        List<Project> projects = projectRepository.findByProjectManagerUserID(pmID);
         return projects.stream().map(ProjectMapper::mapToProjectDto).toList();
     }
 
@@ -90,7 +97,7 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public List<ProjectDto> getAllEnrolledProjects(Long tmID){
-        List<ProjectMember> projectMembers = projectMemberRepository.findByTeamMemberID(tmID);
+        List<ProjectMember> projectMembers = projectMemberRepository.findByTeamMemberUserID(tmID);
 
         return projectMembers.stream().map(pm -> ProjectMapper.mapToProjectDto(pm.getProject())).toList();
     }

@@ -8,6 +8,7 @@ import com.softwareprojectmanagement.backend.services.ProjectService;
 
 import lombok.AllArgsConstructor;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,12 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping
 public class ProjectController {
 
     private ProjectService projectService;
 
-    @PostMapping("/create")
+    @PostMapping("/api/projects/create")
     public ResponseEntity<ProjectDto> createProject(@RequestBody ProjectDto projectDto) {
 
         ProjectDto savedProjectDto = projectService.createProject(projectDto);
@@ -33,27 +34,27 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProjectDto);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/api/projects/get/{id}")
     public ResponseEntity<ProjectDto> getProjectById(@PathVariable Long id) {
         ProjectDto foundProjectDto = projectService.getProjectById(id);
         return ResponseEntity.status(HttpStatus.OK).body(foundProjectDto);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/api/projects/update/{id}")
     public ResponseEntity<ProjectDto> updateProject(@PathVariable Long id, @RequestBody ProjectDto projectDto) {
         projectDto.setProjectID(id);
         ProjectDto updatedProjectDto = projectService.updateProject(projectDto);
         return ResponseEntity.status(HttpStatus.OK).body(updatedProjectDto);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/api/projects/delete/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/")
-    public ResponseEntity<java.util.List<ProjectDto>> getAllProjects(@RequestBody Long pmID) {
+    @GetMapping("/api/projects")
+    public ResponseEntity<java.util.List<ProjectDto>> getAllProjects(@Param("pmID") Long pmID) {
         java.util.List<ProjectDto> projectDtos = projectService.getAllProjects(pmID);
         return ResponseEntity.ok(projectDtos);
     }
