@@ -14,22 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "TeamMember")
-public class TeamMember {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userID;
-
-    @Column(name = "username", nullable = false)
-    private String username;
-
-    @Column(name = "password" , nullable = false)
-    private String password;
-
-    @Column(name = "email" , unique = true)
-    private String email;
-
-    @Column(columnDefinition = "boolean default true")
+public class TeamMember extends User {
     private Boolean availability; 
 
     @OneToMany(mappedBy = "teamMember")
@@ -37,8 +22,5 @@ public class TeamMember {
 
     @OneToMany(mappedBy = "teamMember")
     private List<TeamMemberSkill> teamMemberSkills;
-
-
-
     
 }

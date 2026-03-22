@@ -14,11 +14,12 @@ public class ProjectManagerMapper {
     }
 
     public static ProjectManager mapToProjectManager(ProjectManagerDto projectmanagerdto){
-        return new ProjectManager(
-            projectmanagerdto.getUserID(),
-            projectmanagerdto.getUsername(),
-            projectmanagerdto.getPassword(),
-            projectmanagerdto.getEmail(),
-            null);
+        ProjectManager projectmanager = new ProjectManager();
+        projectmanager.setUserID(projectmanagerdto.getUserID());
+        projectmanager.setUsername(projectmanagerdto.getUsername());
+        projectmanager.setPassword(projectmanagerdto.getPassword());
+        projectmanager.setEmail(projectmanagerdto.getEmail());
+        
+        return projectmanager;
     }
 }
