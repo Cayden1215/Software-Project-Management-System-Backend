@@ -2,9 +2,7 @@ package com.softwareprojectmanagement.backend.services.impl;
 
 import java.util.List;
 
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.ProjectDto;

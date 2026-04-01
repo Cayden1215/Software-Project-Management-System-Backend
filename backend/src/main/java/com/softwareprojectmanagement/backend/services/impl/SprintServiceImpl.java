@@ -9,7 +9,6 @@ import com.softwareprojectmanagement.backend.dto.SprintDto;
 import com.softwareprojectmanagement.backend.entities.Project;
 import com.softwareprojectmanagement.backend.entities.Sprint;
 import com.softwareprojectmanagement.backend.mappers.SprintMapper;
-import com.softwareprojectmanagement.backend.repositories.ProjectRepository;
 import com.softwareprojectmanagement.backend.repositories.SprintRepository;
 import com.softwareprojectmanagement.backend.services.ProjectService;
 import com.softwareprojectmanagement.backend.services.SprintService;

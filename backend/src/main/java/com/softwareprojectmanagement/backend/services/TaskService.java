@@ -2,8 +2,6 @@ package com.softwareprojectmanagement.backend.services;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import com.softwareprojectmanagement.backend.dto.TaskDto;
 
 

@@ -1,7 +1,5 @@
 package com.softwareprojectmanagement.backend.mappers;
 
-import java.time.LocalDate;
-
 import com.softwareprojectmanagement.backend.dto.ProjectDto;
 import com.softwareprojectmanagement.backend.entities.ProjectManager;
 import com.softwareprojectmanagement.backend.entities.Project;
