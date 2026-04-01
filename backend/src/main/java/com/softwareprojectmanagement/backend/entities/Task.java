@@ -43,7 +43,7 @@ public class Task {
     @Column(length = 30)
     private Integer storyPoint;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "projectID")
     private Project project;
 

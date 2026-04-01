@@ -22,7 +22,7 @@ public class TaskMapper {
             task.getRequiredMemberNum(),
             task.getStoryPoint(),
             task.getProject().getProjectID(),
-            task.getSprint().getSprintID()
+            task.getSprint() != null ? task.getSprint().getSprintID() : null
         );
     }
 

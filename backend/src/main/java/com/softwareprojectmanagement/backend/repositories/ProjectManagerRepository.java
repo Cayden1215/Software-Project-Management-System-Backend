@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.softwareprojectmanagement.backend.entities.ProjectManager;
 
 public interface ProjectManagerRepository extends JpaRepository<ProjectManager, Long>{
-
+    
+    public java.util.Optional<ProjectManager> findByEmail(String email);
 }

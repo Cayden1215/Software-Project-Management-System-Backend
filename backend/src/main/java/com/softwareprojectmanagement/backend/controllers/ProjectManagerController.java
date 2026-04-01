@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.softwareprojectmanagement.backend.dto.ProjectManagerDto;
-import com.softwareprojectmanagement.backend.entities.ProjectManager;
 import com.softwareprojectmanagement.backend.services.ProjectManagerService;
 
 import lombok.AllArgsConstructor;

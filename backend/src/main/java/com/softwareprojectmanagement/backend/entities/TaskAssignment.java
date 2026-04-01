@@ -43,8 +43,8 @@ public class TaskAssignment {
     @JoinColumn(name = "taskID", nullable = false)
     private Task task;
 
-    @OneToMany
+    @OneToOne
     @JoinColumn(name = "assignmentID")
-    private List<TeamMember> teamMembers;
+    private TeamMember teamMember;
     
 }

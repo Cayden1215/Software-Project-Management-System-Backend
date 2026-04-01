@@ -1,11 +1,17 @@
 package com.softwareprojectmanagement.backend.services.impl;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.softwareprojectmanagement.backend.dto.TaskDto;
 import com.softwareprojectmanagement.backend.entities.Project;
 import com.softwareprojectmanagement.backend.entities.Task;
 import com.softwareprojectmanagement.backend.mappers.TaskMapper;
 import com.softwareprojectmanagement.backend.repositories.ProjectRepository;
 import com.softwareprojectmanagement.backend.repositories.TaskRepository;
+import com.softwareprojectmanagement.backend.services.ProjectService;
 import com.softwareprojectmanagement.backend.services.TaskService;
 
 import lombok.AllArgsConstructor;
@@ -17,19 +23,26 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Service
 public class TaskServiceImpl implements TaskService {
 
+    @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProjectService projectService;
 
     @Override
     public TaskDto createTask(TaskDto taskDto) {
 
-        Project project = projectRepository.findById(taskDto.getProjectID()).orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = projectService.getProjectEntityById(taskDto.getProjectID());
 
-        Task savedTask = TaskMapper.mapToTask(taskDto, project);
+        Task task = TaskMapper.mapToTask(taskDto, project);
 
-        taskRepository.save(savedTask);
+        Task savedTask = taskRepository.save(task);
 
         return TaskMapper.mapToTaskDto(savedTask);
     }
@@ -43,7 +56,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDto updateTask(TaskDto taskDto){
         Task task = taskRepository.findById(taskDto.getTaskID()).orElseThrow(() -> new RuntimeException("Task not found"));
-        Project project = projectRepository.findById(taskDto.getProjectID()).orElseThrow(() -> new RuntimeException("Project not found"));
 
         task.setTaskName(taskDto.getTaskName());
         task.setEstimatedDuration(taskDto.getEstimatedDuration());
@@ -51,7 +63,6 @@ public class TaskServiceImpl implements TaskService {
         task.setTaskStatus(taskDto.getTaskStatus());
         task.setRequiredMemberNum(taskDto.getRequiredMemberNum());
         task.setStoryPoint(taskDto.getStoryPoint());
-        task.setProject(project);
 
         taskRepository.save(task);
         return TaskMapper.mapToTaskDto(task);
@@ -62,4 +73,11 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
         taskRepository.delete(task);
     }
+
+    @Override
+    public List<TaskDto> listTasksByProjectId(Long projectId) {
+        Project project = projectService.getProjectEntityById(projectId);
+        List<Task> tasks = taskRepository.findByProject(project);
+        return tasks.stream().map(TaskMapper::mapToTaskDto).toList();
+    }    
 }

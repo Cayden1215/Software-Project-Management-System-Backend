@@ -37,7 +37,7 @@ public class Project {
     @Column(name = "projectDescription" , nullable = false)
     private String projectDescription;
 
-    @Column(name = "startDate" , unique = true)
+    @Column(name = "startDate")
     private LocalDate startDate;
 
     @Column(name = "deadline")

@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.ProjectDto;
+import com.softwareprojectmanagement.backend.dto.ProjectMemberDto;
 import com.softwareprojectmanagement.backend.entities.Project;
 import com.softwareprojectmanagement.backend.entities.ProjectManager;
 import com.softwareprojectmanagement.backend.entities.ProjectMember;
@@ -51,7 +53,14 @@ public class ProjectServiceImpl implements ProjectService{
     }
 
     @Override
-    public List<ProjectDto> getAllProjects(Long pmID){
+    public Project getProjectEntityById(Long id) {
+        return projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
+    }
+
+    @Override
+    public List<ProjectDto> getAllProjects(String pmEmail){
+        ProjectManager pm = projectManagerRepository.findByEmail(pmEmail).orElseThrow(() -> new RuntimeException("Project Manager not found"));
+        Long pmID = pm.getUserID();
         List<Project> projects = projectRepository.findByProjectManagerUserID(pmID);
         return projects.stream().map(ProjectMapper::mapToProjectDto).toList();
     }
@@ -79,9 +88,12 @@ public class ProjectServiceImpl implements ProjectService{
     }
 
     @Override
-    public void enrollTeamMemberToProject(Long projectId, Long teamMemberId, String projectRole){
+    public void enrollTeamMemberToProject(Long projectId,ProjectMemberDto projectMemberDto){
+        Long teamMemberId = projectMemberDto.getTeamMemberID();
+        String projectRole = projectMemberDto.getProjectRole();
 
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+
         TeamMember teamMember = teamMemberRepository.findById(teamMemberId).orElseThrow(() -> new RuntimeException("Team Member not found"));
 
         ProjectMember projectMember = new ProjectMember(
