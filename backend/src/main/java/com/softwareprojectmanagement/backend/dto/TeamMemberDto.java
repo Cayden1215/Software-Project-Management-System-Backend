@@ -15,9 +15,9 @@ public class TeamMemberDto {
 
     private String username;
 
-    private String password;
-
     private String email;
     
     private Boolean availability;
+
+    private String role;
 }

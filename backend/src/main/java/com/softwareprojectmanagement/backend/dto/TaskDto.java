@@ -1,5 +1,9 @@
 package com.softwareprojectmanagement.backend.dto;
 
+import java.util.List;
+
+import com.softwareprojectmanagement.backend.entities.Skill;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +23,5 @@ public class TaskDto {
     private int storyPoint;
     private Long projectID;
     private Long sprintID;
+    private List<Long> skillIDs;
 }

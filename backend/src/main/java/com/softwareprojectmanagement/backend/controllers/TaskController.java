@@ -30,9 +30,9 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskDto> createTask(@PathVariable("projectId") Long projectId, @RequestBody TaskDto taskDto) {
         System.out.println("Received Task DTO: " + taskDto);
-        TaskDto createdTask = taskService.createTask(taskDto);
+        TaskDto createdTask = taskService.createTask(projectId, taskDto);
         return ResponseEntity.ok(createdTask);
     }
 
@@ -44,8 +44,7 @@ public class TaskController {
 
     @PutMapping("/{taskId}")
     public ResponseEntity<TaskDto> updateTask(@PathVariable("taskId") Long taskId, @RequestBody TaskDto taskDto) {
-        taskDto.setTaskID(taskId);
-        TaskDto updatedTask = taskService.updateTask(taskDto);
+        TaskDto updatedTask = taskService.updateTask(taskId, taskDto);
         return ResponseEntity.ok(updatedTask);
     }
 

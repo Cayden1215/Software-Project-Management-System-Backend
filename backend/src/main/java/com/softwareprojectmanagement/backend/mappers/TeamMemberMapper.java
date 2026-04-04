@@ -9,24 +9,25 @@ public class TeamMemberMapper {
         return new TeamMemberDto(
             teamMember.getUserID(),
             teamMember.getUsername(),
-            teamMember.getPassword(),
             teamMember.getEmail(),
-            teamMember.getAvailability()
+            teamMember.getAvailability(),
+            teamMember.getRole().name()
         );
     }
 
     public static TeamMember mapToTeamMember(TeamMemberDto teamMemberDto){
         TeamMember teamMember = new TeamMember();
-        teamMember.setUsername(teamMemberDto.getUsername());
-        teamMember.setPassword(teamMemberDto.getPassword());
+        teamMember.setName(teamMemberDto.getUsername());
+        //teamMember.setPassword(teamMemberDto.getPassword());
         teamMember.setEmail(teamMemberDto.getEmail());
         teamMember.setAvailability(teamMemberDto.getAvailability());
+        //teamMember.setRole(TeamMember.Role.valueOf(teamMemberDto.getRole()));
         return teamMember;
     }
 
     public static TeamMember mapToTeamMember(UserDto teamMemberDto){
         TeamMember teamMember = new TeamMember();
-        teamMember.setUsername(teamMemberDto.getUsername());
+        teamMember.setName(teamMemberDto.getName());
         teamMember.setPassword(teamMemberDto.getPassword());
         teamMember.setEmail(teamMemberDto.getEmail());
         teamMember.setAvailability(true);

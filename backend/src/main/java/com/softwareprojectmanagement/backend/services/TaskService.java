@@ -3,12 +3,14 @@ package com.softwareprojectmanagement.backend.services;
 import java.util.List;
 
 import com.softwareprojectmanagement.backend.dto.TaskDto;
+import com.softwareprojectmanagement.backend.entities.Task;
 
 
 public interface TaskService {
-    public TaskDto createTask(TaskDto taskDto);
+    public TaskDto createTask(Long projectId, TaskDto taskDto);
     public TaskDto getTaskById(Long id);
-    public TaskDto updateTask(TaskDto taskDto);
+    public TaskDto updateTask(Long taskId, TaskDto taskDto);
     public void deleteTask(Long id);
     public List<TaskDto> listTasksByProjectId(Long projectId);
+    public List<Task> listTaskEntitiesByProjectId(Long projectId);
 }

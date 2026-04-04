@@ -34,7 +34,7 @@ public class ProjectManagerServiceImpl implements ProjectManagerService {
     public ProjectManagerDto updateProjectManager(Long id, ProjectManagerDto projectManagerDto) {
         ProjectManager projectManager = projectManagerRepository.findById(id).orElseThrow(() -> new RuntimeException("Project Manager not found"));
 
-        projectManager.setUsername(projectManagerDto.getUsername());
+        projectManager.setName(projectManagerDto.getName());
         projectManager.setEmail(projectManagerDto.getEmail());
         projectManager.setPassword(projectManagerDto.getPassword());
         

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.ProjectDto;
 import com.softwareprojectmanagement.backend.dto.ProjectMemberDto;
+import com.softwareprojectmanagement.backend.dto.TeamMemberDto;
 import com.softwareprojectmanagement.backend.entities.Project;
 import com.softwareprojectmanagement.backend.entities.ProjectManager;
 import com.softwareprojectmanagement.backend.entities.ProjectMember;
@@ -37,8 +38,8 @@ public class ProjectServiceImpl implements ProjectService{
     private ProjectMemberRepository projectMemberRepository;
 
     @Override
-    public ProjectDto createProject(ProjectDto projectDto) {
-        ProjectManager projectManager = projectManagerRepository.findById(projectDto.getProjectManagerID()).orElseThrow(() -> new RuntimeException("Project Manager not found"));
+    public ProjectDto createProject(String pmEmail, ProjectDto projectDto) {
+        ProjectManager projectManager = projectManagerRepository.findByEmail(pmEmail).orElseThrow(() -> new RuntimeException("Project Manager not found"));
         Project savedProject = ProjectMapper.mapToProject(projectDto, projectManager);
         savedProject = projectRepository.save(savedProject);
         return ProjectMapper.mapToProjectDto(savedProject);
@@ -87,12 +88,16 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public void enrollTeamMemberToProject(Long projectId,ProjectMemberDto projectMemberDto){
-        Long teamMemberId = projectMemberDto.getTeamMemberID();
+
+        TeamMember teamMember = teamMemberRepository.findByEmail(projectMemberDto.getTeamMemberEmail()).orElseThrow(() -> new RuntimeException("Team Member not found"));
+        
         String projectRole = projectMemberDto.getProjectRole();
 
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
 
-        TeamMember teamMember = teamMemberRepository.findById(teamMemberId).orElseThrow(() -> new RuntimeException("Team Member not found"));
+        if (projectMemberRepository.findByProjectProjectIDAndTeamMemberUserID(projectId, teamMember.getUserID()).isPresent()) {
+            throw new RuntimeException("Team Member is already enrolled in the project");
+        }
 
         ProjectMember projectMember = new ProjectMember(
             null,
@@ -110,5 +115,34 @@ public class ProjectServiceImpl implements ProjectService{
         List<ProjectMember> projectMembers = projectMemberRepository.findByTeamMemberUserID(tmID);
 
         return projectMembers.stream().map(pm -> ProjectMapper.mapToProjectDto(pm.getProject())).toList();
+    }
+
+    @Override
+    public List<ProjectMemberDto> getProjectTeamMembersDto(Project project){
+        List<ProjectMember> projectMembers = project.getProjectMembers();
+
+        List<ProjectMemberDto> projectMemberDtos = projectMembers.stream()
+            .map(pm -> new ProjectMemberDto(
+                pm.getProject().getProjectID(),
+                pm.getTeamMember().getUserID(),
+                pm.getTeamMember().getName(),
+                pm.getTeamMember().getEmail(),
+                pm.getEnrollmentDate(),
+                pm.getProjectRole()
+            ))
+            .toList();
+
+        return projectMemberDtos;
+    }
+
+    @Override
+    public List<TeamMember> getProjectTeamMembers(Project project){
+        List<ProjectMember> projectMembers = project.getProjectMembers();
+        List<TeamMember> teamMembers = projectMembers.stream()
+            .map(ProjectMember::getTeamMember)
+            .distinct()
+            .toList();
+
+        return teamMembers;
     }
 }

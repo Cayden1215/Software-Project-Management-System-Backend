@@ -17,20 +17,25 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("api/v1/skills")
+@RequestMapping("api/v1/project/{projectId}/skills")
 public class SkillController {
 
     private SkillService skillService;
 
     @PostMapping
-    public ResponseEntity<SkillDto> createSkill(@RequestBody SkillDto skillDto) {
-        SkillDto savedSkillDto = skillService.createSkill(skillDto);
+    public ResponseEntity<SkillDto> createSkill(@PathVariable Long projectId, @RequestBody SkillDto skillDto) {
+        SkillDto savedSkillDto = skillService.createSkill(projectId,skillDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSkillDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<SkillDto>> getProjectSkills(@PathVariable Long projectId) {
+        List<SkillDto> skillDtos = skillService.getAllSkillsByProject(projectId);
+        return ResponseEntity.status(HttpStatus.OK).body(skillDtos);
     }
 
     @GetMapping("/{id}")
@@ -43,17 +48,5 @@ public class SkillController {
     public ResponseEntity<Void> deleteSkill(@PathVariable Long id) {
         skillService.deleteSkill(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<SkillDto>> getAllSkills(
-            @RequestParam(value = "projectID", required = false) Long projectID) {
-        List<SkillDto> skillDtos;
-        if (projectID != null) {
-            skillDtos = skillService.getAllSkillsByProject(projectID);
-        } else {
-            skillDtos = skillService.getAllSkills();
-        }
-        return ResponseEntity.ok(skillDtos);
     }
 }

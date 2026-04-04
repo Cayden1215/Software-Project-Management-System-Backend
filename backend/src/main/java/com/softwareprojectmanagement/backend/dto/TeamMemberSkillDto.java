@@ -7,14 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class ProjectManagerDto {
+@NoArgsConstructor
+public class TeamMemberSkillDto {
+    private Long tmsID;
+    private Long skillID;
     private Long userID;
-
-    private String name;
-
-    private String password;
-    
-    private String email;
 }

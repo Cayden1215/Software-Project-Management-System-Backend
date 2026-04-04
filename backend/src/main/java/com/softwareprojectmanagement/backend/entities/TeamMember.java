@@ -18,9 +18,6 @@ public class TeamMember extends User {
     private Boolean availability; 
 
     @OneToMany(mappedBy = "teamMember")
-    private List<ProjectMember> projectMembers;
-
-    @OneToMany(mappedBy = "teamMember")
     private List<TeamMemberSkill> teamMemberSkills;
     
 }

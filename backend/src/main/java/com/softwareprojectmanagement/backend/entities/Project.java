@@ -60,4 +60,7 @@ public class Project {
     @OneToMany(mappedBy = "project")
     private List<Schedule> schedules;
 
+    @OneToMany(mappedBy = "project")
+    private List<Skill> skills;
+
 }

@@ -9,7 +9,7 @@ import com.softwareprojectmanagement.backend.dto.SkillDto;
 @Service
 public interface SkillService {
 
-    public SkillDto createSkill(SkillDto skillDto);
+    public SkillDto createSkill(Long projectId, SkillDto skillDto);
 
     public SkillDto getSkillById(Long id);
 

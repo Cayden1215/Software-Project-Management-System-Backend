@@ -12,11 +12,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectMemberDto {
-    private Long ID;
-
     private Long projectID;
     
     private Long teamMemberID;
+
+    private String teamMemberUsername;
+
+    private String teamMemberEmail;
 
     private LocalDate enrollmentDate;
 

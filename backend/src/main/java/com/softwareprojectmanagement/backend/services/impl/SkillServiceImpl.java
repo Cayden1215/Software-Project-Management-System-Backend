@@ -26,16 +26,13 @@ public class SkillServiceImpl implements SkillService {
     private ProjectService projectService;
 
     @Override
-    public SkillDto createSkill(SkillDto skillDto) {
-        if (skillDto.getProjectID() == null) {
-            throw new RuntimeException("Project ID cannot be null");
-        }
+    public SkillDto createSkill(Long projectId, SkillDto skillDto) {
 
-        if (skillRepository.existsBySkillNameAndProjectProjectID(skillDto.getSkillName(), skillDto.getProjectID())) {
+        if (skillRepository.existsBySkillNameAndProjectProjectID(skillDto.getSkillName(), projectId)) {
             throw new RuntimeException("Skill with name '" + skillDto.getSkillName() + "' already exists in this project");
         }
 
-        Project project = projectService.getProjectEntityById(skillDto.getProjectID());
+        Project project = projectService.getProjectEntityById(projectId);
 
         Skill skill = SkillMapper.mapToSkill(skillDto, project);
         Skill savedSkill = skillRepository.save(skill);

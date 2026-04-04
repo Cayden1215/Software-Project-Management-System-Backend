@@ -19,7 +19,7 @@ public class ProjectManagerMapper {
     public static ProjectManager mapToProjectManager(ProjectManagerDto projectmanagerdto){
         ProjectManager projectmanager = new ProjectManager();
         projectmanager.setUserID(projectmanagerdto.getUserID());
-        projectmanager.setUsername(projectmanagerdto.getUsername());
+        projectmanager.setName(projectmanagerdto.getName());
         projectmanager.setPassword(projectmanagerdto.getPassword());
         projectmanager.setEmail(projectmanagerdto.getEmail());
         
@@ -29,7 +29,7 @@ public class ProjectManagerMapper {
     public static ProjectManager mapToProjectManager(UserDto userDto){
         ProjectManager projectmanager = new ProjectManager();
         projectmanager.setUserID(userDto.getUserID());
-        projectmanager.setUsername(userDto.getUsername());
+        projectmanager.setName(userDto.getName());
         projectmanager.setPassword(userDto.getPassword());
         projectmanager.setEmail(userDto.getEmail());
         projectmanager.setRole(Role.valueOf(userDto.getRole()));

@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.softwareprojectmanagement.backend.dto.ProjectDto;
 import com.softwareprojectmanagement.backend.dto.ProjectMemberDto;
+import com.softwareprojectmanagement.backend.dto.TeamMemberDto;
+import com.softwareprojectmanagement.backend.entities.Project;
+import com.softwareprojectmanagement.backend.entities.TeamMember;
 import com.softwareprojectmanagement.backend.services.ProjectService;
 
 import lombok.AllArgsConstructor;
@@ -31,9 +34,9 @@ public class ProjectController {
     private ProjectService projectService;
 
     @PostMapping
-    public ResponseEntity<ProjectDto> createProject(@RequestBody ProjectDto projectDto) {
+    public ResponseEntity<ProjectDto> createProject(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ProjectDto projectDto) {
 
-        ProjectDto savedProjectDto = projectService.createProject(projectDto);
+        ProjectDto savedProjectDto = projectService.createProject(userDetails.getUsername(), projectDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProjectDto);
     }
@@ -67,5 +70,12 @@ public class ProjectController {
     public ResponseEntity<Void> enrollTeamMemberToProject(@PathVariable Long id, @RequestBody ProjectMemberDto projectMemberDto) {
         projectService.enrollTeamMemberToProject(id, projectMemberDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/{projectId}/enrolled")
+    public ResponseEntity<List<ProjectMemberDto>> getProjectTeamMembers(@PathVariable Long projectId) {
+        Project project = projectService.getProjectEntityById(projectId);
+        List<ProjectMemberDto> teamMemberDtos = projectService.getProjectTeamMembersDto(project);
+        return ResponseEntity.ok(teamMemberDtos);
     }
 }

@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         if (role.equals("PROJECT_MANAGER")) {
             ProjectManager projectManager = new ProjectManager();
 
-            projectManager.setUsername(userDto.getUsername());
+            projectManager.setName(userDto.getName());
             projectManager.setPassword(passwordEncoder.encode(userDto.getPassword()));
             projectManager.setEmail(userDto.getEmail());
             projectManager.setRole(com.softwareprojectmanagement.backend.entities.Role.PROJECT_MANAGER);
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
             TeamMember teamMember = new TeamMember();
 
             teamMember.setUserID(userDto.getUserID());
-            teamMember.setUsername(userDto.getUsername());
+            teamMember.setName(userDto.getName());
             teamMember.setPassword(passwordEncoder.encode(userDto.getPassword()));
             teamMember.setEmail(userDto.getEmail());
             teamMember.setAvailability(true);

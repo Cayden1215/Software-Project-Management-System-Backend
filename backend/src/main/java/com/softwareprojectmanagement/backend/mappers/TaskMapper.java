@@ -1,7 +1,10 @@
 package com.softwareprojectmanagement.backend.mappers;
 
+import java.util.List;
+
 import com.softwareprojectmanagement.backend.dto.TaskDto;
 import com.softwareprojectmanagement.backend.entities.Project;
+import com.softwareprojectmanagement.backend.entities.Skill;
 import com.softwareprojectmanagement.backend.entities.Sprint;
 import com.softwareprojectmanagement.backend.entities.Task;
 
@@ -13,17 +16,20 @@ import lombok.Setter;
 public class TaskMapper {
 
     public static TaskDto mapToTaskDto(Task task){
-        return new TaskDto(
-            task.getTaskID(),
-            task.getTaskName(),
-            task.getEstimatedDuration(),
-            task.getDescription(),
-            task.getTaskStatus(),
-            task.getRequiredMemberNum(),
-            task.getStoryPoint(),
-            task.getProject().getProjectID(),
-            task.getSprint() != null ? task.getSprint().getSprintID() : null
-        );
+        TaskDto taskDto = new TaskDto();
+
+        taskDto.setTaskID(task.getTaskID());
+        taskDto.setTaskName(task.getTaskName());
+        taskDto.setEstimatedDuration(task.getEstimatedDuration());
+        taskDto.setDescription(task.getDescription());
+        taskDto.setTaskStatus(task.getTaskStatus());
+        taskDto.setRequiredMemberNum(task.getRequiredMemberNum());
+        taskDto.setStoryPoint(task.getStoryPoint());
+        taskDto.setProjectID(task.getProject().getProjectID());
+        taskDto.setSprintID(task.getSprint() != null ? task.getSprint().getSprintID() : null);
+        taskDto.setSkillIDs(task.getSkills().stream().map(Skill::getSkillID).toList());
+
+        return taskDto;
     }
 
     public static Task mapToTask(TaskDto taskDto, Project project, Sprint sprint){
@@ -42,7 +48,7 @@ public class TaskMapper {
         return task;
     }
 
-    public static Task mapToTask(TaskDto taskDto, Project project){
+    public static Task mapToTask(TaskDto taskDto, Project project, List<Skill> skills){
 
         Task task = new Task();
 
@@ -53,6 +59,7 @@ public class TaskMapper {
         task.setRequiredMemberNum(taskDto.getRequiredMemberNum());
         task.setStoryPoint(taskDto.getStoryPoint());
         task.setProject(project);
+        task.setSkills(skills);
 
         return task;
     }

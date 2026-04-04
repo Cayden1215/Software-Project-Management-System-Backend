@@ -1,12 +1,14 @@
 package com.softwareprojectmanagement.backend.services.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.TaskDto;
 import com.softwareprojectmanagement.backend.entities.Project;
+import com.softwareprojectmanagement.backend.entities.Skill;
 import com.softwareprojectmanagement.backend.entities.Task;
 import com.softwareprojectmanagement.backend.mappers.TaskMapper;
 import com.softwareprojectmanagement.backend.repositories.ProjectRepository;
@@ -36,11 +38,27 @@ public class TaskServiceImpl implements TaskService {
     private ProjectService projectService;
 
     @Override
-    public TaskDto createTask(TaskDto taskDto) {
+    public TaskDto createTask(Long projectId, TaskDto taskDto) {
 
-        Project project = projectService.getProjectEntityById(taskDto.getProjectID());
+        Project project = projectService.getProjectEntityById(projectId);
 
-        Task task = TaskMapper.mapToTask(taskDto, project);
+        Task task;
+
+        if(taskDto.getSkillIDs()!=null){
+            List<Skill> skills = taskDto.getSkillIDs().stream()
+                .map(skillId -> {
+                    Skill skill = project.getSkills().stream()
+                            .filter(s -> s.getSkillID().equals(skillId))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Skill with ID " + skillId + " not found in project"));
+                    return skill;
+                })
+                .collect(Collectors.toList());
+
+                task = TaskMapper.mapToTask(taskDto, project, skills);
+        }else{
+            task = TaskMapper.mapToTask(taskDto, project, List.of());
+        }
 
         Task savedTask = taskRepository.save(task);
 
@@ -54,8 +72,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDto updateTask(TaskDto taskDto){
-        Task task = taskRepository.findById(taskDto.getTaskID()).orElseThrow(() -> new RuntimeException("Task not found"));
+    public TaskDto updateTask(Long taskId, TaskDto taskDto){
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found"));
+
+        Project project = task.getProject();
 
         task.setTaskName(taskDto.getTaskName());
         task.setEstimatedDuration(taskDto.getEstimatedDuration());
@@ -63,6 +83,20 @@ public class TaskServiceImpl implements TaskService {
         task.setTaskStatus(taskDto.getTaskStatus());
         task.setRequiredMemberNum(taskDto.getRequiredMemberNum());
         task.setStoryPoint(taskDto.getStoryPoint());
+
+        if(taskDto.getSkillIDs()!=null){
+            List<Skill> skills = taskDto.getSkillIDs().stream()
+                .map(skillId -> {
+                    Skill skill = project.getSkills().stream()
+                            .filter(s -> s.getSkillID().equals(skillId))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Skill with ID " + skillId + " not found in project"));
+                    return skill;
+                })
+                .collect(Collectors.toList());
+
+            task.setSkills(skills);
+        }
 
         taskRepository.save(task);
         return TaskMapper.mapToTaskDto(task);
@@ -79,5 +113,11 @@ public class TaskServiceImpl implements TaskService {
         Project project = projectService.getProjectEntityById(projectId);
         List<Task> tasks = taskRepository.findByProject(project);
         return tasks.stream().map(TaskMapper::mapToTaskDto).toList();
+    }
+    
+    @Override
+    public List<Task> listTaskEntitiesByProjectId(Long projectId) {
+        Project project = projectService.getProjectEntityById(projectId);
+        return taskRepository.findByProject(project);
     }    
 }
