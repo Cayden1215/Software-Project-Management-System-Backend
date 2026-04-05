@@ -1,4 +1,4 @@
-package com.softwareprojectmanagement.backend.controllers;
+/*package com.softwareprojectmanagement.backend.controllers;
 
 import java.util.List;
 
@@ -64,3 +64,5 @@ public class TeamMemberSkillController {
         return ResponseEntity.status(HttpStatus.OK).body(allTeamMemberSkills);
     }
 }
+
+*/

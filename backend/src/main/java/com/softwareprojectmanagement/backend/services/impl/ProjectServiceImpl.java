@@ -130,7 +130,8 @@ public class ProjectServiceImpl implements ProjectService{
                 pm.getTeamMember().getName(),
                 pm.getTeamMember().getEmail(),
                 pm.getEnrollmentDate(),
-                pm.getProjectRole()
+                pm.getProjectRole(),
+                pm.getSkills()
             ))
             .toList();
 

@@ -2,8 +2,11 @@ package com.softwareprojectmanagement.backend.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,9 +35,7 @@ public class Skill {
 
     @ManyToOne
     @JoinColumn(name = "projectID", nullable = false)
+    @JsonIgnore
     private Project project;
-
-    @OneToMany(mappedBy = "skillID")
-    private List<TeamMemberSkill> teamMemberSkills;
 
 }

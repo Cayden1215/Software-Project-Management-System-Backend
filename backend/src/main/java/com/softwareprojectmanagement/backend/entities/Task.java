@@ -2,6 +2,7 @@ package com.softwareprojectmanagement.backend.entities;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -53,7 +54,7 @@ public class Task {
     @JoinColumn(name = "projectID")
     private Project project;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "sprintID")
     private Sprint sprint;
 
@@ -67,5 +68,17 @@ public class Task {
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private List<Skill> skills;
+
+    @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinTable(
+        name = "task_dependencies",
+        joinColumns = @JoinColumn(name = "task_id"),
+        inverseJoinColumns = @JoinColumn(name = "dependency_id")
+    )
+    private Set<Task> dependencies = new HashSet<>();
+
+    @ManyToMany(mappedBy = "dependencies")
+    private Set<Task> dependentTasks = new HashSet<>();
+
 
 }

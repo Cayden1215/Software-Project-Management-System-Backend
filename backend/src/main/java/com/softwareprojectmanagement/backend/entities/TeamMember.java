@@ -17,7 +17,7 @@ import lombok.Setter;
 public class TeamMember extends User {
     private Boolean availability; 
 
-    @OneToMany(mappedBy = "teamMember")
-    private List<TeamMemberSkill> teamMemberSkills;
+    @OneToMany(mappedBy = "teamMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectMember> projectMemberships;
     
 }
