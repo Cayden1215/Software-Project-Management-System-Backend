@@ -18,4 +18,6 @@ public interface SkillService {
     public List<SkillDto> getAllSkillsByProject(Long projectID);
 
     public List<SkillDto> getAllSkills();
+
+    
 }

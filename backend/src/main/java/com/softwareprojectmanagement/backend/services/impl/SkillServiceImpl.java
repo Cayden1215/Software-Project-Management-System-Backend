@@ -68,4 +68,6 @@ public class SkillServiceImpl implements SkillService {
         List<Skill> skills = skillRepository.findAll();
         return skills.stream().map(SkillMapper::mapToSkillDto).toList();
     }
+
+    
 }

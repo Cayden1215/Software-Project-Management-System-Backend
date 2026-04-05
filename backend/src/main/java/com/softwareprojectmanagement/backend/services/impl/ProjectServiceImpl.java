@@ -104,7 +104,8 @@ public class ProjectServiceImpl implements ProjectService{
             project,
             teamMember,
             java.time.LocalDate.now(),
-            projectRole
+            projectRole,
+            null
         );
 
         projectMemberRepository.save(projectMember);
@@ -123,6 +124,7 @@ public class ProjectServiceImpl implements ProjectService{
 
         List<ProjectMemberDto> projectMemberDtos = projectMembers.stream()
             .map(pm -> new ProjectMemberDto(
+                pm.getID(),
                 pm.getProject().getProjectID(),
                 pm.getTeamMember().getUserID(),
                 pm.getTeamMember().getName(),
