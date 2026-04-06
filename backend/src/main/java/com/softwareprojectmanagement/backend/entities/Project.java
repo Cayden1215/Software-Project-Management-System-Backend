@@ -59,9 +59,9 @@ public class Project {
     private Set<Sprint> sprints = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private Set<Schedule> schedules = new HashSet<>();
+    private Set<Skill> skills = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private Set<Skill> skills = new HashSet<>();
+    private Set<TaskAssignment> taskAssignments = new HashSet<>();
 
 }

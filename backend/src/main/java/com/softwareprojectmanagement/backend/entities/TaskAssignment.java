@@ -33,16 +33,16 @@ public class TaskAssignment {
     @Column
     private LocalDate scheduledEndDate;
 
-    @ManyToOne
-    @JoinColumn(name = "scheduleID", nullable = false)
-    private Schedule schedule;
-
     @OneToOne
     @JoinColumn(name = "taskID", nullable = false)
     private Task task;
 
     @OneToOne
     @JoinColumn(name = "assignmentID")
-    private TeamMember teamMember;
+    private ProjectMember assignedMember;
+
+    @ManyToOne
+    @JoinColumn(name = "projectID", nullable = false)
+    private Project project;
     
 }
