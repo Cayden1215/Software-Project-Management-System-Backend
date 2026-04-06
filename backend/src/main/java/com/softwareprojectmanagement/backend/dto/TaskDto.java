@@ -24,4 +24,5 @@ public class TaskDto {
     private Long projectID;
     private Long sprintID;
     private List<Long> skillIDs;
+    private List<Long> dependencyIds;
 }

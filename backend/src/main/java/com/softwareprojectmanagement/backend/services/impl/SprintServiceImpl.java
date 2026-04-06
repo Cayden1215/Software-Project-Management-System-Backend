@@ -1,5 +1,6 @@
 package com.softwareprojectmanagement.backend.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class SprintServiceImpl implements SprintService {
     public List<SprintDto> getSprintsByProjectId(Long projectId) {
         Project project = projectService.getProjectEntityById(projectId);
 
-        List<Sprint> sprints = project.getSprints();
+        List<Sprint> sprints = new ArrayList<>(project.getSprints());
         return sprints.stream().map(SprintMapper::mapToSprintDto).toList();
     }
 

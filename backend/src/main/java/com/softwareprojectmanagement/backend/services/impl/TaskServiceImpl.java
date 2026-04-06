@@ -1,6 +1,8 @@
 package com.softwareprojectmanagement.backend.services.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,13 @@ public class TaskServiceImpl implements TaskService {
             task = TaskMapper.mapToTask(taskDto, project, List.of());
         }
 
+        // Validate and set dependencies
+        if (taskDto.getDependencyIds() != null && !taskDto.getDependencyIds().isEmpty()) {
+            validateAndSetDependencies(task, taskDto.getDependencyIds());
+        } else {
+            task.setDependencies(new HashSet<>());
+        }
+
         Task savedTask = taskRepository.save(task);
 
         return TaskMapper.mapToTaskDto(savedTask);
@@ -95,11 +104,46 @@ public class TaskServiceImpl implements TaskService {
                 })
                 .collect(Collectors.toList());
 
-            task.setSkills(skills);
+            Set<Skill> skillsSet = new HashSet<>(skills);
+            task.setSkills(skillsSet);
+        }
+
+        // Validate and set dependencies if provided
+        if(taskDto.getDependencyIds()!=null){
+            validateAndSetDependencies(task, taskDto.getDependencyIds());
         }
 
         taskRepository.save(task);
         return TaskMapper.mapToTaskDto(task);
+    }
+
+    @Override
+    public TaskDto updateTaskDependencies(Long taskId, List<Long> dependencyIds) {
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task with ID " + taskId + " not found"));
+
+        // Validate and set new dependencies
+        validateAndSetDependencies(task, dependencyIds);
+
+        Task updatedTask = taskRepository.save(task);
+
+        return TaskMapper.mapToTaskDto(updatedTask);
+    }
+
+    @Override
+    public TaskDto removeDependency(Long taskId, Long dependencyId) {
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task with ID " + taskId + " not found"));
+
+        Task dependencyTask = taskRepository.findById(dependencyId)
+            .orElseThrow(() -> new RuntimeException("Dependency task with ID " + dependencyId + " not found"));
+
+        // Remove the dependency
+        task.getDependencies().remove(dependencyTask);
+
+        Task updatedTask = taskRepository.save(task);
+
+        return TaskMapper.mapToTaskDto(updatedTask);
     }
 
     @Override
@@ -120,4 +164,74 @@ public class TaskServiceImpl implements TaskService {
         Project project = projectService.getProjectEntityById(projectId);
         return taskRepository.findByProject(project);
     }    
+
+
+    /**
+     * Validates and sets dependencies for a task, checking for:
+     * - Self-dependencies
+     * - Non-existent dependency IDs
+     * - Circular dependencies
+     */
+    private void validateAndSetDependencies(Task task, List<Long> dependencyIds) {
+        if (dependencyIds == null || dependencyIds.isEmpty()) {
+            task.setDependencies(new HashSet<>());
+            return;
+        }
+
+        // Check for self-dependency
+        if (dependencyIds.contains(task.getTaskID())) {
+            throw new RuntimeException("A task cannot depend on itself");
+        }
+
+        // Fetch all dependency tasks and validate they exist
+        Set<Task> dependencies = dependencyIds.stream()
+            .map(depId -> taskRepository.findById(depId)
+                .orElseThrow(() -> new RuntimeException("Dependency task with ID " + depId + " not found")))
+            .collect(Collectors.toSet());
+
+        // Check for circular dependencies
+        if (hasCircularDependency(task, dependencies)) {
+            throw new RuntimeException("Circular dependency detected");
+        }
+
+        task.setDependencies(dependencies);
+    }
+
+    /**
+     * Detects circular dependencies using depth-first search (DFS)
+     * Returns true if adding dependencies to the task would create a circular dependency
+     */
+    private boolean hasCircularDependency(Task task, Set<Task> newDependencies) {
+        // For each new dependency, check if it can reach back to this task
+        for (Task dependency : newDependencies) {
+            if (canReachTask(dependency, task, new HashSet<>())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * DFS to check if sourceTask can reach targetTask through existing dependencies
+     */
+    private boolean canReachTask(Task sourceTask, Task targetTask, Set<Long> visited) {
+        if (sourceTask.getTaskID().equals(targetTask.getTaskID())) {
+            return true;
+        }
+
+        if (visited.contains(sourceTask.getTaskID())) {
+            return false;
+        }
+
+        visited.add(sourceTask.getTaskID());
+
+        // Check all tasks that depend on sourceTask
+        for (Task dependentTask : sourceTask.getDependentTasks()) {
+            if (canReachTask(dependentTask, targetTask, visited)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

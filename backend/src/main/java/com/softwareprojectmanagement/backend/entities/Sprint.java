@@ -1,7 +1,8 @@
 package com.softwareprojectmanagement.backend.entities;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,5 +49,5 @@ public class Sprint {
     private Project project;
 
     @OneToMany(mappedBy = "sprint")
-    private List<Task> tasks;
+    private Set<Task> tasks = new HashSet<>();
 }

@@ -1,6 +1,7 @@
 package com.softwareprojectmanagement.backend.entities;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,6 @@ public class TeamMember extends User {
     private Boolean availability; 
 
     @OneToMany(mappedBy = "teamMember", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectMember> projectMemberships;
+    private Set<ProjectMember> projectMemberships = new HashSet<>();
     
 }

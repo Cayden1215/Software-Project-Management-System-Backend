@@ -1,6 +1,8 @@
 package com.softwareprojectmanagement.backend.mappers;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.softwareprojectmanagement.backend.dto.TaskDto;
 import com.softwareprojectmanagement.backend.entities.Project;
@@ -28,11 +30,12 @@ public class TaskMapper {
         taskDto.setProjectID(task.getProject().getProjectID());
         taskDto.setSprintID(task.getSprint() != null ? task.getSprint().getSprintID() : null);
         taskDto.setSkillIDs(task.getSkills().stream().map(Skill::getSkillID).toList());
+        taskDto.setDependencyIds(task.getDependencies().stream().map(Task::getTaskID).toList());
 
         return taskDto;
     }
 
-    public static Task mapToTask(TaskDto taskDto, Project project, Sprint sprint){
+    public static Task mapToTask(TaskDto taskDto, Project project, Sprint sprint){//unused
 
         Task task = new Task();
 
@@ -44,6 +47,7 @@ public class TaskMapper {
         task.setStoryPoint(taskDto.getStoryPoint());
         task.setProject(project);
         task.setSprint(sprint);
+        task.setDependencies(new HashSet<>());
 
         return task;
     }
@@ -59,7 +63,9 @@ public class TaskMapper {
         task.setRequiredMemberNum(taskDto.getRequiredMemberNum());
         task.setStoryPoint(taskDto.getStoryPoint());
         task.setProject(project);
-        task.setSkills(skills);
+        task.setSkills(new HashSet<Skill>(skills));
+        task.setDependencies(new HashSet<>());
+
 
         return task;
     }

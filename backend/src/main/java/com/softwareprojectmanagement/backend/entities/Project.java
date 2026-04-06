@@ -1,7 +1,8 @@
 package com.softwareprojectmanagement.backend.entities;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,18 +50,18 @@ public class Project {
     private ProjectManager projectManager;
 
     @OneToMany(mappedBy = "project")
-    private List<Task> tasks;
+    private Set<Task> tasks = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private List<ProjectMember> projectMembers;
+    private Set<ProjectMember> projectMembers = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private List<Sprint> sprints;
+    private Set<Sprint> sprints = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private List<Schedule> schedules;
+    private Set<Schedule> schedules = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private List<Skill> skills;
+    private Set<Skill> skills = new HashSet<>();
 
 }

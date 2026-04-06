@@ -1,6 +1,7 @@
 package com.softwareprojectmanagement.backend.services.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class ProjectMemberSkillServiceImpl implements ProjectMemberSkillService 
 
         // Add new skills to existing skills
         if (projectMember.getSkills() == null) {
-            projectMember.setSkills(new ArrayList<>());
+            projectMember.setSkills(new HashSet<>());
         }
 
         for (Skill skill : skillsToAdd) {
@@ -91,7 +92,7 @@ public class ProjectMemberSkillServiceImpl implements ProjectMemberSkillService 
         }
 
         // Replace existing skills with new skills
-        projectMember.setSkills(newSkills);
+        projectMember.setSkills(new HashSet<>(newSkills));
 
         ProjectMember updatedProjectMember = projectMemberRepository.save(projectMember);
         return mapToProjectMemberSkillDto(updatedProjectMember);
@@ -125,7 +126,7 @@ public class ProjectMemberSkillServiceImpl implements ProjectMemberSkillService 
                 .orElseThrow(() -> new RuntimeException("Project member not found"));
 
         if (projectMember.getSkills() != null) {
-            projectMember.setSkills(new ArrayList<>());
+            projectMember.setSkills(new HashSet<>());
             projectMemberRepository.save(projectMember);
         }
     }

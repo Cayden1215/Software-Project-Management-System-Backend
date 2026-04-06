@@ -1,7 +1,8 @@
 package com.softwareprojectmanagement.backend.entities;
 
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,5 +37,5 @@ public class Schedule {
     private Project project;
 
     @OneToMany(mappedBy = "schedule")
-    private List<TaskAssignment> taskAssignments;
+    private Set<TaskAssignment> taskAssignments = new HashSet<>();
 }

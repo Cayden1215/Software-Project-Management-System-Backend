@@ -1,6 +1,7 @@
 package com.softwareprojectmanagement.backend.entities;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -18,6 +19,6 @@ import lombok.Setter;
 @Table(name = "ProjectManager") 
 public class ProjectManager extends User {
     @OneToMany(mappedBy = "projectManager")
-    private List<Project> projects;
+    private Set<Project> projects = new HashSet<>();
     
 }

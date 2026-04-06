@@ -13,4 +13,6 @@ public interface TaskService {
     public void deleteTask(Long id);
     public List<TaskDto> listTasksByProjectId(Long projectId);
     public List<Task> listTaskEntitiesByProjectId(Long projectId);
+    public TaskDto updateTaskDependencies(Long taskId, List<Long> dependencyIds);
+    public TaskDto removeDependency(Long taskId, Long dependencyId);
 }

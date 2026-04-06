@@ -1,7 +1,8 @@
 package com.softwareprojectmanagement.backend.entities;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -51,6 +52,6 @@ public class ProjectMember {
         joinColumns = @JoinColumn(name = "project_member_id"),
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
-    private List<Skill> skills;
+    private Set<Skill> skills = new HashSet<>();
 
 }

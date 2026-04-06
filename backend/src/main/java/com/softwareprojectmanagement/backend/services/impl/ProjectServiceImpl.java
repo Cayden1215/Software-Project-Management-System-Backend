@@ -1,5 +1,6 @@
 package com.softwareprojectmanagement.backend.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,7 +121,7 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public List<ProjectMemberDto> getProjectTeamMembersDto(Project project){
-        List<ProjectMember> projectMembers = project.getProjectMembers();
+        List<ProjectMember> projectMembers = new ArrayList<>(project.getProjectMembers());
 
         List<ProjectMemberDto> projectMemberDtos = projectMembers.stream()
             .map(pm -> new ProjectMemberDto(
@@ -131,7 +132,7 @@ public class ProjectServiceImpl implements ProjectService{
                 pm.getTeamMember().getEmail(),
                 pm.getEnrollmentDate(),
                 pm.getProjectRole(),
-                pm.getSkills()
+                new ArrayList<>(pm.getSkills())
             ))
             .toList();
 
@@ -140,7 +141,7 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public List<TeamMember> getProjectTeamMembers(Project project){
-        List<ProjectMember> projectMembers = project.getProjectMembers();
+        List<ProjectMember> projectMembers = new ArrayList<>(project.getProjectMembers());
         List<TeamMember> teamMembers = projectMembers.stream()
             .map(ProjectMember::getTeamMember)
             .distinct()
