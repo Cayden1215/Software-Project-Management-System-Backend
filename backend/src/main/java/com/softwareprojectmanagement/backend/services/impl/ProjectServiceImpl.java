@@ -8,15 +8,18 @@ import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.ProjectDto;
 import com.softwareprojectmanagement.backend.dto.ProjectMemberDto;
+import com.softwareprojectmanagement.backend.dto.TaskAssignmentDto;
 import com.softwareprojectmanagement.backend.dto.TeamMemberDto;
 import com.softwareprojectmanagement.backend.entities.Project;
 import com.softwareprojectmanagement.backend.entities.ProjectManager;
 import com.softwareprojectmanagement.backend.entities.ProjectMember;
 import com.softwareprojectmanagement.backend.entities.TeamMember;
+import com.softwareprojectmanagement.backend.entities.TaskAssignment;
 import com.softwareprojectmanagement.backend.mappers.ProjectMapper;
 import com.softwareprojectmanagement.backend.repositories.ProjectManagerRepository;
 import com.softwareprojectmanagement.backend.repositories.ProjectMemberRepository;
 import com.softwareprojectmanagement.backend.repositories.ProjectRepository;
+import com.softwareprojectmanagement.backend.repositories.TaskAssignmentRepository;
 import com.softwareprojectmanagement.backend.repositories.TeamMemberRepository;
 import com.softwareprojectmanagement.backend.services.ProjectService;
 
@@ -37,6 +40,9 @@ public class ProjectServiceImpl implements ProjectService{
     
     @Autowired
     private ProjectMemberRepository projectMemberRepository;
+
+    @Autowired
+    private TaskAssignmentRepository taskAssignmentRepository;
 
     @Override
     public ProjectDto createProject(String pmEmail, ProjectDto projectDto) {
@@ -148,5 +154,41 @@ public class ProjectServiceImpl implements ProjectService{
             .toList();
 
         return teamMembers;
+    }
+
+    @Override
+    public List<TaskAssignmentDto> getProjectTaskAssignments(Long projectId) {
+        Project project = getProjectEntityById(projectId);
+        List<TaskAssignment> taskAssignments = taskAssignmentRepository.findByProject(project);
+        
+        return taskAssignments.stream()
+            .map(assignment -> {
+                TaskAssignmentDto dto = new TaskAssignmentDto();
+                dto.setAssignmentID(assignment.getAssignmentID());
+                dto.setTaskID(assignment.getTask().getTaskID());
+                dto.setTaskName(assignment.getTask().getTaskName());
+                dto.setRequiredMemberNum(assignment.getTask().getRequiredMemberNum());
+                
+                // Convert Set<ProjectMember> to lists of IDs and names
+                if (assignment.getAssignedMembers() != null && !assignment.getAssignedMembers().isEmpty()) {
+                    dto.setAssignedMemberIds(
+                        assignment.getAssignedMembers().stream()
+                            .map(member -> member.getTeamMember().getUserID())
+                            .toList()
+                    );
+                    dto.setAssignedMemberNames(
+                        assignment.getAssignedMembers().stream()
+                            .map(member -> member.getTeamMember().getName())
+                            .toList()
+                    );
+                }
+                
+                dto.setScheduledStartDate(assignment.getScheduledStartDate());
+                dto.setScheduledEndDate(assignment.getScheduledEndDate());
+                dto.setProjectID(assignment.getProject().getProjectID());
+                
+                return dto;
+            })
+            .toList();
     }
 }

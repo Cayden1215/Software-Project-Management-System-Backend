@@ -11,7 +11,7 @@ public interface ProjectMemberSkillService {
 
     public ProjectMemberSkillDto addSkillsToProjectMember(Long projectId, ProjectMemberSkillDto projectMemberSkillDto);
 
-    public ProjectMemberSkillDto updateProjectMemberSkills(Long projectId, ProjectMemberSkillDto projectMemberSkillDto);
+    public ProjectMemberSkillDto updateProjectMemberSkills(Long projectId, Long projectMemberID, ProjectMemberSkillDto projectMemberSkillDto);
 
     public ProjectMemberSkillDto getProjectMemberSkills(Long projectMemberID);
 

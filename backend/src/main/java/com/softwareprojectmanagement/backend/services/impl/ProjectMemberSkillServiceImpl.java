@@ -69,7 +69,7 @@ public class ProjectMemberSkillServiceImpl implements ProjectMemberSkillService 
     }
 
     @Override
-    public ProjectMemberSkillDto updateProjectMemberSkills(Long projectId, ProjectMemberSkillDto projectMemberSkillDto) {
+    public ProjectMemberSkillDto updateProjectMemberSkills(Long projectId, Long projectMemberID, ProjectMemberSkillDto projectMemberSkillDto) {
         if (projectMemberSkillDto.getProjectMemberID() == null || projectMemberSkillDto.getSkillIDs() == null) {
             throw new RuntimeException("ProjectMember ID and Skill IDs cannot be null");
         }
@@ -78,7 +78,7 @@ public class ProjectMemberSkillServiceImpl implements ProjectMemberSkillService 
             throw new RuntimeException("Skill IDs list cannot be empty");
         }
 
-        ProjectMember projectMember = projectMemberRepository.findById(projectMemberSkillDto.getProjectMemberID())
+        ProjectMember projectMember = projectMemberRepository.findById(projectMemberID)
                 .orElseThrow(() -> new RuntimeException("Project member not found"));
 
         List<Skill> newSkills = new ArrayList<>();

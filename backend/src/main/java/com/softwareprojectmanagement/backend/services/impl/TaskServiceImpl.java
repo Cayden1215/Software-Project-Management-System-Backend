@@ -226,7 +226,7 @@ public class TaskServiceImpl implements TaskService {
         visited.add(sourceTask.getTaskID());
 
         // Check all tasks that depend on sourceTask
-        for (Task dependentTask : sourceTask.getDependentTasks()) {
+        for (Task dependentTask : targetTask.getDependentTasks()) {
             if (canReachTask(dependentTask, targetTask, visited)) {
                 return true;
             }
@@ -234,4 +234,5 @@ public class TaskServiceImpl implements TaskService {
 
         return false;
     }
+    
 }

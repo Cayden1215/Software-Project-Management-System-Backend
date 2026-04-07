@@ -26,12 +26,6 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
     private static final double ELITISM_RATE = 0.1; // Keep top 10%
 
     @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private TaskService taskService;
-
-    @Autowired
     private ProjectRepository projectRepository;
 
     @Autowired
@@ -52,23 +46,26 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
      */
     private static class Gene {
         Task task;
-        ProjectMember assignedMember;
+        Set<ProjectMember> assignedMembers; // Multiple members per task
         int startTime; // Relative hours/days from project start
 
-        Gene(Task task, ProjectMember assignedMember, int startTime) {
+        Gene(Task task, Set<ProjectMember> assignedMembers, int startTime) {
             this.task = task;
-            this.assignedMember = assignedMember;
+            this.assignedMembers = new HashSet<>(assignedMembers);
             this.startTime = startTime;
         }
 
         Gene copy() {
-            return new Gene(this.task, this.assignedMember, this.startTime);
+            return new Gene(this.task, new HashSet<>(this.assignedMembers), this.startTime);
         }
 
         @Override
         public String toString() {
-            return String.format("Gene[Task:%s, Member:%s, StartTime:%d]", 
-                task.getTaskName(), assignedMember.getTeamMember().getName(), startTime);
+            String members = assignedMembers.stream()
+                .map(m -> m.getTeamMember().getName())
+                .collect(Collectors.joining(", "));
+            return String.format("Gene[Task:%s, Members:[%s], StartTime:%d]", 
+                task.getTaskName(), members, startTime);
         }
     }
 
@@ -149,11 +146,21 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
                 }
             }
 
+            // Restore topological order after crossover
+            for (Chromosome chromosome : offspring) {
+                sortChromosomeTopologically(chromosome);
+            }
+
             // Apply mutation
             for (Chromosome chromosome : offspring) {
                 if (random.nextDouble() < MUTATION_RATE) {
                     mutate(chromosome, allTasks, projectTeamMembers);
                 }
+            }
+
+            // Restore topological order after mutation
+            for (Chromosome chromosome : offspring) {
+                sortChromosomeTopologically(chromosome);
             }
 
             // Merge elite solutions with offspring
@@ -182,6 +189,7 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
     /**
      * Generate initial population of random candidate schedules
      * Constraint: Ensure skill matching for task assignments
+     * Each task is assigned to multiple members based on task.getRequiredMemberNum()
      */
     private List<Chromosome> initializePopulation(List<Task> allTasks, List<ProjectMember> projectMembers) {
         List<Chromosome> population = new ArrayList<>();
@@ -192,10 +200,17 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
             
             List<Gene> genes = new ArrayList<>();
             for (Task task : taskSequence) {
-                // Find a compatible team member with required skills
-                ProjectMember compatibleMember = findCompatibleMember(task, projectMembers);
-                if (compatibleMember != null) {
-                    genes.add(new Gene(task, compatibleMember, 0)); // Temporary startTime, will be calculated
+                // Find compatible team members with required skills
+                Set<ProjectMember> compatibleMembers = findCompatibleMembers(task, projectMembers);
+                
+                if (!compatibleMembers.isEmpty()) {
+                    // Assign the required number of members, or all available if fewer than required
+                    int requiredCount = task.getRequiredMemberNum() != null ? task.getRequiredMemberNum() : 1;
+                    Set<ProjectMember> assignedMembers = selectRandomMembers(compatibleMembers, requiredCount);
+                    
+                    if (!assignedMembers.isEmpty()) {
+                        genes.add(new Gene(task, assignedMembers, 0)); // Temporary startTime, will be calculated
+                    }
                 }
             }
 
@@ -205,14 +220,32 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
             }
         }
 
+
+
+
+
+
+
+
+
+
+
+
+        //Suspect Duplicated
+
+
         // Ensure we have at least POPULATION_SIZE chromosomes
         while (population.size() < POPULATION_SIZE) {
             List<Task> taskSequence = generateRandomTopologicalOrder(allTasks);
             List<Gene> genes = new ArrayList<>();
             for (Task task : taskSequence) {
-                ProjectMember compatibleMember = findCompatibleMember(task, projectMembers);
-                if (compatibleMember != null) {
-                    genes.add(new Gene(task, compatibleMember, 0));
+                Set<ProjectMember> compatibleMembers = findCompatibleMembers(task, projectMembers);
+                if (!compatibleMembers.isEmpty()) {
+                    int requiredCount = task.getRequiredMemberNum() != null ? task.getRequiredMemberNum() : 1;
+                    Set<ProjectMember> assignedMembers = selectRandomMembers(compatibleMembers, requiredCount);
+                    if (!assignedMembers.isEmpty()) {
+                        genes.add(new Gene(task, assignedMembers, 0));
+                    }
                 }
             }
             if (!genes.isEmpty()) {
@@ -267,18 +300,74 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
     }
 
     /**
-     * Find a compatible ProjectMember with all required skills for a task
+     * Re-sort a chromosome's genes to maintain topological order
+     * This is necessary after crossover and mutation operations that may violate task dependencies
      */
-    private ProjectMember findCompatibleMember(Task task, List<ProjectMember> projectMembers) {
-        List<ProjectMember> compatible = projectMembers.stream()
-            .filter(member -> hasAllRequiredSkills(member, task.getSkills()))
-            .collect(Collectors.toList());
-
-        if (compatible.isEmpty()) {
-            return null;
+    private void sortChromosomeTopologically(Chromosome chromosome) {
+        Map<Task, Gene> taskToGene = new HashMap<>();
+        for (Gene gene : chromosome.genes) {
+            taskToGene.put(gene.task, gene);
         }
 
-        return compatible.get(random.nextInt(compatible.size()));
+        List<Gene> sortedGenes = new ArrayList<>();
+        Set<Task> visited = new HashSet<>();
+        Set<Task> tempVisited = new HashSet<>();
+
+        // Perform topological sort on genes
+        for (Gene gene : chromosome.genes) {
+            topologicalSortGeneUtil(gene.task, visited, tempVisited, sortedGenes, taskToGene);
+        }
+
+        chromosome.genes = sortedGenes;
+    }
+
+    /**
+     * Utility for DFS-based topological sorting of genes within a chromosome
+     */
+    private void topologicalSortGeneUtil(Task task, Set<Task> visited, Set<Task> tempVisited,
+                                         List<Gene> result, Map<Task, Gene> taskToGene) {
+        if (visited.contains(task)) {
+            return;
+        }
+
+        tempVisited.add(task);
+
+        // Visit all dependencies first
+        for (Task dependency : task.getDependencies()) {
+            if (taskToGene.containsKey(dependency) && !visited.contains(dependency)) {
+                topologicalSortGeneUtil(dependency, visited, tempVisited, result, taskToGene);
+            }
+        }
+
+        tempVisited.remove(task);
+        visited.add(task);
+        result.add(taskToGene.get(task));
+    }
+
+    /**
+     * Find all compatible ProjectMembers with required skills for a task
+     */
+    private Set<ProjectMember> findCompatibleMembers(Task task, List<ProjectMember> projectMembers) {
+        return projectMembers.stream()
+            .filter(member -> hasAllRequiredSkills(member, task.getSkills()))
+            .collect(Collectors.toSet());
+    }
+
+    /**
+     * Select a random subset of members from compatible members.
+     * Selects up to 'count' members randomly from the provided set.
+     */
+    private Set<ProjectMember> selectRandomMembers(Set<ProjectMember> compatibleMembers, int count) {
+        Set<ProjectMember> selected = new HashSet<>();
+        List<ProjectMember> list = new ArrayList<>(compatibleMembers);
+        Collections.shuffle(list, random);
+        
+        int selectCount = Math.min(count, list.size());
+        for (int i = 0; i < selectCount; i++) {
+            selected.add(list.get(i));
+        }
+        
+        return selected;
     }
 
     /**
@@ -295,9 +384,10 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
      * Evaluate fitness of a candidate schedule
      * Constraints:
      * 1. Task dependencies must be respected
-     * 2. Resource availability must be tracked
-     * 3. MakeSpan = maximum completion time of all tasks
-     * 4. Fitness Score = 1.0 / makeSpan
+     * 2. Resource availability must be tracked for each member
+     * 3. Multiple members can be assigned to a task
+     * 4. MakeSpan = maximum completion time of all tasks
+     * 5. Fitness Score = 1.0 / makeSpan
      */
     private void evaluateFitness(Chromosome chromosome, List<Task> allTasks, Project project) {
         // Map tasks to genes for easy lookup
@@ -309,7 +399,9 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
         // Track resource availability for each ProjectMember
         Map<ProjectMember, Integer> memberAvailability = new HashMap<>();
         for (Gene gene : chromosome.genes) {
-            memberAvailability.put(gene.assignedMember, 0);
+            for (ProjectMember member : gene.assignedMembers) {
+                memberAvailability.putIfAbsent(member, 0);
+            }
         }
 
         // Calculate start and end times for each task
@@ -327,17 +419,23 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
                 }
             }
 
-            // Constraint 2: Resource availability - find earliest slot where member is free
-            ProjectMember member = gene.assignedMember;
-            int memberFreeTime = memberAvailability.getOrDefault(member, 0);
-            int startTime = Math.max(earliestStart, memberFreeTime);
+            // Constraint 2: Resource availability - find earliest slot where ALL assigned members are free
+            int latestMemberFreeTime = 0;
+            for (ProjectMember member : gene.assignedMembers) {
+                int memberFreeTime = memberAvailability.getOrDefault(member, 0);
+                latestMemberFreeTime = Math.max(latestMemberFreeTime, memberFreeTime);
+            }
+            
+            int startTime = Math.max(earliestStart, latestMemberFreeTime);
 
             // Assign the calculated start time
             gene.startTime = startTime;
 
-            // Update member availability
+            // Update availability for all assigned members
             int endTime = startTime + task.getEstimatedDuration();
-            memberAvailability.put(member, endTime);
+            for (ProjectMember member : gene.assignedMembers) {
+                memberAvailability.put(member, endTime);
+            }
 
             // Track maximum end time (makeSpan)
             maxEndTime = Math.max(maxEndTime, endTime);
@@ -394,7 +492,7 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
     }
 
     /**
-     * Helper method for Order Crossover
+     * Helper method for Order Crossover that handles multiple member assignments
      */
     private List<Gene> createCrossoverChild(List<Gene> primaryParent, List<Gene> secondaryParent,
                                            int point1, int point2, List<ProjectMember> projectMembers) {
@@ -411,19 +509,25 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
         // Fill remaining from secondary parent (maintaining order)
         for (Gene parentGene : secondaryParent) {
             if (!usedTasks.contains(parentGene.task)) {
-                Gene newGene = new Gene(parentGene.task, parentGene.assignedMember, 0);
+                Set<ProjectMember> assignedMembers;
                 
                 // Resource Crossover: 50% chance to inherit from secondary parent assignment
                 if (random.nextDouble() < 0.5) {
-                    newGene.assignedMember = parentGene.assignedMember;
+                    assignedMembers = new HashSet<>(parentGene.assignedMembers);
                 } else {
-                    // Otherwise, find another compatible member (or keep secondary)
-                    ProjectMember compatible = findCompatibleMember(parentGene.task, projectMembers);
-                    if (compatible != null) {
-                        newGene.assignedMember = compatible;
+                    // Otherwise, find another compatible member set
+                    Set<ProjectMember> compatible = findCompatibleMembers(parentGene.task, projectMembers);
+                    int requiredCount = parentGene.task.getRequiredMemberNum() != null ? 
+                        parentGene.task.getRequiredMemberNum() : 1;
+                    assignedMembers = selectRandomMembers(compatible, requiredCount);
+                    
+                    // If we can't find enough compatible members, use parent's assignment
+                    if (assignedMembers.isEmpty()) {
+                        assignedMembers = new HashSet<>(parentGene.assignedMembers);
                     }
                 }
                 
+                Gene newGene = new Gene(parentGene.task, assignedMembers, 0);
                 child.add(newGene);
                 usedTasks.add(parentGene.task);
             }
@@ -437,7 +541,7 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
     /**
      * Apply random variations to escape local optima
      * 1. Swap Mutation: Swap two random task positions
-     * 2. Reassignment Mutation: Reassign a task to a different compatible member
+     * 2. Reassignment Mutation: Reassign a task to different compatible members
      */
     private void mutate(Chromosome chromosome, List<Task> allTasks, List<ProjectMember> projectMembers) {
         if (chromosome.genes.isEmpty()) {
@@ -456,17 +560,25 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
             chromosome.genes.set(pos1, chromosome.genes.get(pos2));
             chromosome.genes.set(pos2, temp);
         } else {
-            // Reassignment Mutation: Reassign a task to a different compatible member
+            // Reassignment Mutation: Reassign members for a task to different compatible members
             int taskIndex = random.nextInt(chromosome.genes.size());
             Gene gene = chromosome.genes.get(taskIndex);
             
-            List<ProjectMember> compatibleMembers = projectMembers.stream()
-                .filter(member -> hasAllRequiredSkills(member, gene.task.getSkills())
-                        && !member.equals(gene.assignedMember))
-                .collect(Collectors.toList());
+            Set<ProjectMember> compatibleMembers = findCompatibleMembers(gene.task, projectMembers);
             
-            if (!compatibleMembers.isEmpty()) {
-                gene.assignedMember = compatibleMembers.get(random.nextInt(compatibleMembers.size()));
+            // Filter out currently assigned members to get alternatives
+            Set<ProjectMember> alternativeMembers = compatibleMembers.stream()
+                .filter(member -> !gene.assignedMembers.contains(member))
+                .collect(Collectors.toSet());
+            
+            if (!alternativeMembers.isEmpty()) {
+                int requiredCount = gene.task.getRequiredMemberNum() != null ? 
+                    gene.task.getRequiredMemberNum() : 1;
+                Set<ProjectMember> newMembers = selectRandomMembers(alternativeMembers, requiredCount);
+                
+                if (!newMembers.isEmpty()) {
+                    gene.assignedMembers = newMembers;
+                }
             }
         }
     }
@@ -476,6 +588,7 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
     /**
      * Save the optimal schedule to database
      * Convert relative integer startTime to actual LocalDate based on project start date
+     * Each task assignment now includes multiple assigned members
      */
     private void persistSchedule(Chromosome bestSchedule, Project project) {
         LocalDate projectStartDate = project.getStartDate();
@@ -492,7 +605,7 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
             TaskAssignment assignment = new TaskAssignment();
             assignment.setProject(project);
             assignment.setTask(gene.task);
-            assignment.setAssignedMember(gene.assignedMember);
+            assignment.setAssignedMembers(new HashSet<>(gene.assignedMembers));
             
             // Convert relative time (hours/days) to absolute LocalDate
             LocalDate scheduledStartDate = projectStartDate.plusDays(gene.startTime);
@@ -500,6 +613,11 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
             
             assignment.setScheduledStartDate(scheduledStartDate);
             assignment.setScheduledEndDate(scheduledEndDate);
+            
+            // Validate member count before persistence
+            if (!assignment.isValidMemberCount()) {
+                throw new IllegalArgumentException(assignment.getValidationError());
+            }
             
             taskAssignmentRepository.save(assignment);
         }

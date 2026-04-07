@@ -36,12 +36,13 @@ public class ProjectMemberSkillController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @PutMapping
+    @PutMapping("/{projectMemberID}")
     public ResponseEntity<ProjectMemberSkillDto> updateProjectMemberSkills(
             @PathVariable("projectId") Long projectId,
+            @PathVariable("projectMemberID") Long projectMemberID,
             @RequestBody ProjectMemberSkillDto projectMemberSkillDto) {
         ProjectMemberSkillDto result = projectMemberSkillService
-                .updateProjectMemberSkills(projectId, projectMemberSkillDto);
+                .updateProjectMemberSkills(projectId, projectMemberID, projectMemberSkillDto);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.softwareprojectmanagement.backend.dto.ProjectDto;
 import com.softwareprojectmanagement.backend.dto.ProjectMemberDto;
+import com.softwareprojectmanagement.backend.dto.TaskAssignmentDto;
 import com.softwareprojectmanagement.backend.dto.TeamMemberDto;
 import com.softwareprojectmanagement.backend.entities.Project;
 import com.softwareprojectmanagement.backend.entities.TeamMember;
@@ -32,5 +33,7 @@ public interface ProjectService {
     public List<ProjectMemberDto> getProjectTeamMembersDto(Project project);
 
     public List<TeamMember> getProjectTeamMembers(Project project);
+
+    public List<TaskAssignmentDto> getProjectTaskAssignments(Long projectId);
 
 }

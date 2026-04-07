@@ -32,6 +32,9 @@ public class SecurityConfig {
                 // Only Project Managers can manage projects
                 .requestMatchers("/api/projects/**").hasRole("PROJECT_MANAGER")
                 
+                // Only Project Managers can access scheduling endpoints
+                .requestMatchers("/api/v1/scheduling/**").hasRole("PROJECT_MANAGER")
+                
                 // Both roles can interact with tasks
                 .requestMatchers("/api/tasks/**").hasAnyRole("PROJECT_MANAGER", "TEAM_MEMBER")
                 
