@@ -54,51 +54,5 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Update the entire list of dependencies for a task
-     * PUT /api/v1/projects/{projectId}/tasks/{taskId}/dependencies
-     * Body: { "dependencyIds": [1, 2, 3] }
-     */
-    @PutMapping("/{taskId}/dependencies")
-    public ResponseEntity<TaskDto> updateTaskDependencies(
-            @PathVariable("projectId") Long projectId,
-            @PathVariable("taskId") Long taskId,
-            @RequestBody DependencyUpdateRequest request) {
-        TaskDto updatedTask = taskService.updateTaskDependencies(taskId, request.getDependencyIds());
-        return ResponseEntity.ok(updatedTask);
-    }
-
-    /**
-     * Remove a specific dependency from a task
-     * DELETE /api/v1/projects/{projectId}/tasks/{taskId}/dependencies/{dependencyId}
-     */
-    @DeleteMapping("/{taskId}/dependencies/{dependencyId}")
-    public ResponseEntity<TaskDto> removeDependency(
-            @PathVariable("projectId") Long projectId,
-            @PathVariable("taskId") Long taskId,
-            @PathVariable("dependencyId") Long dependencyId) {
-        TaskDto updatedTask = taskService.removeDependency(taskId, dependencyId);
-        return ResponseEntity.ok(updatedTask);
-    }
-
-    /**
-     * Inner class for dependency update request body
-     */
-    public static class DependencyUpdateRequest {
-        private List<Long> dependencyIds;
-
-        public DependencyUpdateRequest() {}
-
-        public DependencyUpdateRequest(List<Long> dependencyIds) {
-            this.dependencyIds = dependencyIds;
-        }
-
-        public List<Long> getDependencyIds() {
-            return dependencyIds;
-        }
-
-        public void setDependencyIds(List<Long> dependencyIds) {
-            this.dependencyIds = dependencyIds;
-        }
-    }
+    
 }

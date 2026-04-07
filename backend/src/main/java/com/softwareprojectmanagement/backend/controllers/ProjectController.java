@@ -66,7 +66,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectDtos);
     }
 
-    @PostMapping("/{id}/enroll") //havent test
+    @PostMapping("/{id}/enroll")
     public ResponseEntity<Void> enrollTeamMemberToProject(@PathVariable Long id, @RequestBody ProjectMemberDto projectMemberDto) {
         projectService.enrollTeamMemberToProject(id, projectMemberDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
