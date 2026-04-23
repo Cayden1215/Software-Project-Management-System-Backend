@@ -93,9 +93,24 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     }
 
     @Override
-    public TaskAssignmentDto getTaskAssignmentById(Long assignmentId) {
-        TaskAssignment taskAssignment = taskAssignmentRepository.findById(assignmentId)
-            .orElseThrow(() -> new RuntimeException("Task assignment not found with ID: " + assignmentId));
+    public TaskAssignmentDto getTaskAssignment(Long projectId, Long taskId) {
+        // Validate project exists
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+
+        // Validate task exists and belongs to project
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
+
+        if (!task.getProject().getProjectID().equals(projectId)) {
+            throw new RuntimeException("Task does not belong to the specified project");
+        }
+
+        // Get the task assignment
+        TaskAssignment taskAssignment = task.getTaskAssignment();
+        if (taskAssignment == null) {
+            throw new RuntimeException("Task assignment not found for task ID: " + taskId);
+        }
         return TaskAssignmentMapper.mapToTaskAssignmentDto(taskAssignment);
     }
 
@@ -123,9 +138,24 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     }
 
     @Override
-    public TaskAssignmentDto updateTaskAssignment(Long assignmentId, TaskAssignmentDto taskAssignmentDto) {
-        TaskAssignment taskAssignment = taskAssignmentRepository.findById(assignmentId)
-            .orElseThrow(() -> new RuntimeException("Task assignment not found with ID: " + assignmentId));
+    public TaskAssignmentDto updateTaskAssignment(Long projectId, Long taskId, TaskAssignmentDto taskAssignmentDto) {
+        // Validate project exists
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+
+        // Validate task exists and belongs to project
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
+
+        if (!task.getProject().getProjectID().equals(projectId)) {
+            throw new RuntimeException("Task does not belong to the specified project");
+        }
+
+        // Get the task assignment
+        TaskAssignment taskAssignment = task.getTaskAssignment();
+        if (taskAssignment == null) {
+            throw new RuntimeException("Task assignment not found for task ID: " + taskId);
+        }
 
         // Update scheduling dates
         if (taskAssignmentDto.getScheduledStartDate() != null) {
@@ -143,7 +173,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
                     .orElseThrow(() -> new RuntimeException("Project member not found with ID: " + memberId));
                 
                 // Verify member belongs to project
-                if (!member.getProject().getProjectID().equals(taskAssignment.getProject().getProjectID())) {
+                if (!member.getProject().getProjectID().equals(projectId)) {
                     throw new RuntimeException("Project member does not belong to the project");
                 }
                 
@@ -163,17 +193,47 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     }
 
     @Override
-    public void deleteTaskAssignment(Long assignmentId) {
-        if (!taskAssignmentRepository.existsById(assignmentId)) {
-            throw new RuntimeException("Task assignment not found with ID: " + assignmentId);
+    public void deleteTaskAssignment(Long projectId, Long taskId) {
+        // Validate project exists
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+
+        // Validate task exists and belongs to project
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
+
+        if (!task.getProject().getProjectID().equals(projectId)) {
+            throw new RuntimeException("Task does not belong to the specified project");
         }
-        taskAssignmentRepository.deleteById(assignmentId);
+
+        // Get the task assignment
+        TaskAssignment taskAssignment = task.getTaskAssignment();
+        if (taskAssignment == null) {
+            throw new RuntimeException("Task assignment not found for task ID: " + taskId);
+        }
+
+        taskAssignmentRepository.deleteById(taskAssignment.getAssignmentID());
     }
 
     @Override
-    public TaskAssignmentDto allocateMembers(Long assignmentId, List<Long> memberIds) {
-        TaskAssignment taskAssignment = taskAssignmentRepository.findById(assignmentId)
-            .orElseThrow(() -> new RuntimeException("Task assignment not found with ID: " + assignmentId));
+    public TaskAssignmentDto allocateMembers(Long projectId, Long taskId, List<Long> memberIds) {
+        // Validate project exists
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+
+        // Validate task exists and belongs to project
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
+
+        if (!task.getProject().getProjectID().equals(projectId)) {
+            throw new RuntimeException("Task does not belong to the specified project");
+        }
+
+        // Get the task assignment
+        TaskAssignment taskAssignment = task.getTaskAssignment();
+        if (taskAssignment == null) {
+            throw new RuntimeException("Task assignment not found for task ID: " + taskId);
+        }
 
         Set<ProjectMember> assignedMembers = new HashSet<>();
         for (Long memberId : memberIds) {
@@ -181,7 +241,7 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
                 .orElseThrow(() -> new RuntimeException("Project member not found with ID: " + memberId));
             
             // Verify member belongs to project
-            if (!member.getProject().getProjectID().equals(taskAssignment.getProject().getProjectID())) {
+            if (!member.getProject().getProjectID().equals(projectId)) {
                 throw new RuntimeException("Project member does not belong to the project");
             }
             
@@ -200,9 +260,24 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     }
 
     @Override
-    public TaskAssignmentDto scheduleTaskAssignment(Long assignmentId, TaskAssignmentDto taskAssignmentDto) {
-        TaskAssignment taskAssignment = taskAssignmentRepository.findById(assignmentId)
-            .orElseThrow(() -> new RuntimeException("Task assignment not found with ID: " + assignmentId));
+    public TaskAssignmentDto scheduleTaskAssignment(Long projectId, Long taskId, TaskAssignmentDto taskAssignmentDto) {
+        // Validate project exists
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+
+        // Validate task exists and belongs to project
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
+
+        if (!task.getProject().getProjectID().equals(projectId)) {
+            throw new RuntimeException("Task does not belong to the specified project");
+        }
+
+        // Get the task assignment
+        TaskAssignment taskAssignment = task.getTaskAssignment();
+        if (taskAssignment == null) {
+            throw new RuntimeException("Task assignment not found for task ID: " + taskId);
+        }
 
         if (taskAssignmentDto.getScheduledStartDate() == null) {
             throw new RuntimeException("Scheduled start date is required");
@@ -218,9 +293,24 @@ public class TaskAssignmentServiceImpl implements TaskAssignmentService {
     }
 
     @Override
-    public TaskAssignmentDto removeMemberFromAssignment(Long assignmentId, Long memberId) {
-        TaskAssignment taskAssignment = taskAssignmentRepository.findById(assignmentId)
-            .orElseThrow(() -> new RuntimeException("Task assignment not found with ID: " + assignmentId));
+    public TaskAssignmentDto removeMemberFromAssignment(Long projectId, Long taskId, Long memberId) {
+        // Validate project exists
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found with ID: " + projectId));
+
+        // Validate task exists and belongs to project
+        Task task = taskRepository.findById(taskId)
+            .orElseThrow(() -> new RuntimeException("Task not found with ID: " + taskId));
+
+        if (!task.getProject().getProjectID().equals(projectId)) {
+            throw new RuntimeException("Task does not belong to the specified project");
+        }
+
+        // Get the task assignment
+        TaskAssignment taskAssignment = task.getTaskAssignment();
+        if (taskAssignment == null) {
+            throw new RuntimeException("Task assignment not found for task ID: " + taskId);
+        }
 
         ProjectMember member = projectMemberRepository.findById(memberId)
             .orElseThrow(() -> new RuntimeException("Project member not found with ID: " + memberId));

@@ -24,12 +24,13 @@ public interface TaskAssignmentService {
     TaskAssignmentDto createTaskAssignment(Long projectId, Long taskId, TaskAssignmentDto taskAssignmentDto);
 
     /**
-     * Get a task assignment by its ID.
+     * Get a task assignment by its task ID.
      * 
-     * @param assignmentId The assignment ID
+     * @param projectId The project ID
+     * @param taskId The task ID
      * @return The TaskAssignmentDto
      */
-    TaskAssignmentDto getTaskAssignmentById(Long assignmentId);
+    TaskAssignmentDto getTaskAssignment(Long projectId, Long taskId);
 
     /**
      * Get all task assignments for a specific project.
@@ -50,43 +51,48 @@ public interface TaskAssignmentService {
     /**
      * Update an existing task assignment (members and/or schedule).
      * 
-     * @param assignmentId The assignment ID
+     * @param projectId The project ID
+     * @param taskId The task ID
      * @param taskAssignmentDto The updated assignment details
      * @return The updated TaskAssignmentDto
      */
-    TaskAssignmentDto updateTaskAssignment(Long assignmentId, TaskAssignmentDto taskAssignmentDto);
+    TaskAssignmentDto updateTaskAssignment(Long projectId, Long taskId, TaskAssignmentDto taskAssignmentDto);
 
     /**
      * Delete a task assignment.
      * 
-     * @param assignmentId The assignment ID
+     * @param projectId The project ID
+     * @param taskId The task ID
      */
-    void deleteTaskAssignment(Long assignmentId);
+    void deleteTaskAssignment(Long projectId, Long taskId);
 
     /**
      * Allocate members to an existing task assignment.
      * 
-     * @param assignmentId The assignment ID
+     * @param projectId The project ID
+     * @param taskId The task ID
      * @param memberIds List of project member IDs to allocate
      * @return The updated TaskAssignmentDto
      */
-    TaskAssignmentDto allocateMembers(Long assignmentId, List<Long> memberIds);
+    TaskAssignmentDto allocateMembers(Long projectId, Long taskId, List<Long> memberIds);
 
     /**
      * Schedule a task assignment with start and end dates.
      * 
-     * @param assignmentId The assignment ID
+     * @param projectId The project ID
+     * @param taskId The task ID
      * @param taskAssignmentDto Contains the scheduled start and end dates
      * @return The updated TaskAssignmentDto
      */
-    TaskAssignmentDto scheduleTaskAssignment(Long assignmentId, TaskAssignmentDto taskAssignmentDto);
+    TaskAssignmentDto scheduleTaskAssignment(Long projectId, Long taskId, TaskAssignmentDto taskAssignmentDto);
 
     /**
      * Remove a member from a task assignment.
      * 
-     * @param assignmentId The assignment ID
+     * @param projectId The project ID
+     * @param taskId The task ID
      * @param memberId The project member ID to remove
      * @return The updated TaskAssignmentDto
      */
-    TaskAssignmentDto removeMemberFromAssignment(Long assignmentId, Long memberId);
+    TaskAssignmentDto removeMemberFromAssignment(Long projectId, Long taskId, Long memberId);
 }

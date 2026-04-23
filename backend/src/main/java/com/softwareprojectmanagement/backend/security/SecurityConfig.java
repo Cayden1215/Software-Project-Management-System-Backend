@@ -27,7 +27,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
             .authorizeHttpRequests(auth -> auth
                 // Allow anyone to access the login/register endpoints
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/**","/v3/api-docs",
+                "/v3/api-docs.yaml",
+                "/swagger-ui/**",
+                "/swagger-ui.html").permitAll()
                 
                 // Only Project Managers can manage projects
                 .requestMatchers("/api/projects/**").hasRole("PROJECT_MANAGER")

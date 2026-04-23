@@ -17,7 +17,7 @@ import com.softwareprojectmanagement.backend.dto.TaskDto;
 import com.softwareprojectmanagement.backend.services.TaskService;
 
 @Controller
-@RequestMapping("api/v1/projects/{projectId}/tasks")
+@RequestMapping("api/v1/project/{projectId}/tasks")
 public class TaskController {
 
     @Autowired

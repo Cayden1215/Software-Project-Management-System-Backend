@@ -60,9 +60,12 @@ public class SprintController {
         return ResponseEntity.status(HttpStatus.OK).body(sprintDtos);
     }
 
+
+    /* 
     @GetMapping
     public ResponseEntity<List<SprintDto>> getAllSprints() {
         List<SprintDto> sprintDtos = sprintService.getAllSprints();
         return ResponseEntity.status(HttpStatus.OK).body(sprintDtos);
     }
+        */
 }

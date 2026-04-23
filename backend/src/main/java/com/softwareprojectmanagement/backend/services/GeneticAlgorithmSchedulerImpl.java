@@ -45,6 +45,7 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
      * Represents a single scheduled task with its assignment details
      */
     private static class Gene {
+
         Task task;
         Set<ProjectMember> assignedMembers; // Multiple members per task
         int startTime; // Relative hours/days from project start
@@ -102,6 +103,7 @@ public class GeneticAlgorithmSchedulerImpl implements GeneticAlgorithmScheduler 
     @Override
     public void scheduleProject(Long projectID) {
         Project project = projectRepository.findById(projectID).orElseThrow();
+
         List<Task> allTasks = taskRepository.findByProject(project);
         List<ProjectMember> projectMembers = projectMemberRepository.findByTeamMemberUserID(
             project.getProjectMembers().stream()
