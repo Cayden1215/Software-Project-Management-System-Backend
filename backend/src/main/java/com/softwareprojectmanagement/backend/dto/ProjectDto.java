@@ -1,6 +1,10 @@
 package com.softwareprojectmanagement.backend.dto;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import com.softwareprojectmanagement.backend.entities.Task;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +23,5 @@ public class ProjectDto {
     private LocalDate deadline;
     private String projectStatus;
     private Long projectManagerID;
+    private List<TaskDto> tasks;
 }

@@ -16,7 +16,8 @@ public class SprintMapper {
         sprintDto.setEndDate(sprint.getEndDate());
         sprintDto.setSprintGoal(sprint.getSprintGoal());
         sprintDto.setSprintStatus(sprint.getSprintStatus());
-        sprintDto.setProject(sprint.getProject());
+        sprintDto.setProject(sprint.getProject().getProjectID());
+
         return sprintDto;
     }
 

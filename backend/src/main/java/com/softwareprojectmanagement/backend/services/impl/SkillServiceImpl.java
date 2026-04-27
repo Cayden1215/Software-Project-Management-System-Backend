@@ -51,6 +51,8 @@ public class SkillServiceImpl implements SkillService {
     public void deleteSkill(Long id) {
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Skill not found"));
+        skill.getTasks().forEach(task -> task.getSkills().remove(skill));
+        skill.getProjectMembers().forEach(projectMember -> projectMember.getSkills().remove(skill));
         skillRepository.delete(skill);
     }
 

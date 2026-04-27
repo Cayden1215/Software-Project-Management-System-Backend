@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,10 +37,12 @@ public class ProjectMember {
 
     @ManyToOne
     @JoinColumn(name = "projectID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     @ManyToOne
     @JoinColumn(name = "userID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private TeamMember teamMember;
 
     @Column(name = "enrollmentDate" , nullable = false)
@@ -53,5 +58,4 @@ public class ProjectMember {
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private Set<Skill> skills = new HashSet<>();
-
 }

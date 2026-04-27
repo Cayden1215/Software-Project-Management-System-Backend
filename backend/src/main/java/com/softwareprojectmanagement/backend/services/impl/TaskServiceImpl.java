@@ -108,6 +108,13 @@ public class TaskServiceImpl implements TaskService {
             task.setSkills(skillsSet);
         }
 
+        if(taskDto.getSprintID() != null){
+            task.setSprint(project.getSprints().stream()
+                .filter(s -> s.getSprintID().equals(taskDto.getSprintID()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Sprint with ID " + taskDto.getSprintID() + " not found in project")));
+        }
+
         // Validate and set dependencies if provided
         if(taskDto.getDependencyIds()!=null){
             validateAndSetDependencies(task, taskDto.getDependencyIds());
@@ -149,6 +156,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void deleteTask(Long id){
         Task task = taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
+        task.getDependentTasks().forEach(dependentTask -> dependentTask.getDependencies().remove(task));
+        task.getDependencies().clear();
         taskRepository.delete(task);
     }
 
@@ -226,7 +235,7 @@ public class TaskServiceImpl implements TaskService {
         visited.add(sourceTask.getTaskID());
 
         // Check all tasks that depend on sourceTask
-        for (Task dependentTask : targetTask.getDependentTasks()) {
+        for (Task dependentTask : targetTask.getDependencies()) {
             if (canReachTask(dependentTask, targetTask, visited)) {
                 return true;
             }

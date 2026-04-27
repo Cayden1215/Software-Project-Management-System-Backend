@@ -4,6 +4,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder.Default;
 
 @Getter
 @Setter
@@ -41,21 +47,24 @@ public class Task {
     @Column(length = 255)
     private String description;
 
-    @Column(length = 10)
-    private String taskStatus;
+    @Column
+    private String taskStatus = "To Do";
 
     @Column(length = 30)
-    private Integer requiredMemberNum;
+    private Integer requiredMemberNum = 1;
 
     @Column(length = 30)
     private Integer storyPoint;
 
     @ManyToOne
     @JoinColumn(name = "projectID")
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     @ManyToOne
     @JoinColumn(name = "sprintID")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Sprint sprint;
 
     @OneToOne(mappedBy = "task")
@@ -79,6 +88,5 @@ public class Task {
 
     @ManyToMany(mappedBy = "dependencies")
     private Set<Task> dependentTasks = new HashSet<>();
-
 
 }

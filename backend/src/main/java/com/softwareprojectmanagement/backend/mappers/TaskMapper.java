@@ -28,7 +28,9 @@ public class TaskMapper {
         taskDto.setRequiredMemberNum(task.getRequiredMemberNum());
         taskDto.setStoryPoint(task.getStoryPoint());
         taskDto.setProjectID(task.getProject().getProjectID());
-        taskDto.setSprintID(task.getSprint() != null ? task.getSprint().getSprintID() : null);
+        if(task.getSprint() != null ) {
+            taskDto.setSprintID(task.getSprint().getSprintID());
+        }
         taskDto.setSkillIDs(task.getSkills().stream().map(Skill::getSkillID).toList());
         taskDto.setDependencyIds(task.getDependencies().stream().map(Task::getTaskID).toList());
 

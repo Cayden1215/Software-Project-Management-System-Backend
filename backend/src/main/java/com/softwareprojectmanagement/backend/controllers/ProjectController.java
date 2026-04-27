@@ -78,4 +78,10 @@ public class ProjectController {
         List<ProjectMemberDto> teamMemberDtos = projectService.getProjectTeamMembersDto(project);
         return ResponseEntity.ok(teamMemberDtos);
     }
+
+    @DeleteMapping("/{projectId}/enrolled/{teamMemberId}")
+    public ResponseEntity<Void> removeTeamMemberFromProject(@PathVariable Long projectId, @PathVariable Long teamMemberId) {
+        projectService.removeTeamMemberFromProject(projectId, teamMemberId);
+        return ResponseEntity.noContent().build();
+    }
 }

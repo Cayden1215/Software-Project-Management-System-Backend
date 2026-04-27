@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +43,7 @@ public class TaskAssignment {
 
     @OneToOne
     @JoinColumn(name = "taskID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Task task;
 
     @ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
@@ -52,6 +56,7 @@ public class TaskAssignment {
 
     @ManyToOne
     @JoinColumn(name = "projectID", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     /**

@@ -31,8 +31,8 @@ public class SprintServiceImpl implements SprintService {
         Project project = projectService.getProjectEntityById(projectId);
 
         Sprint sprint = SprintMapper.mapToSprint(sprintDto, project);
-        sprint = sprintRepository.save(sprint);
-        return SprintMapper.mapToSprintDto(sprint);
+        Sprint savedSprint = sprintRepository.save(sprint);
+        return SprintMapper.mapToSprintDto(savedSprint);
     }
 
     @Override

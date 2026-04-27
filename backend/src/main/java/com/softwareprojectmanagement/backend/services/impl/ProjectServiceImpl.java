@@ -191,4 +191,12 @@ public class ProjectServiceImpl implements ProjectService{
             })
             .toList();
     }
+
+    @Override
+    public void removeTeamMemberFromProject(Long projectId, Long teamMemberId) {
+        ProjectMember projectMember = projectMemberRepository.findByProjectProjectIDAndTeamMemberUserID
+            (projectId, teamMemberId)
+            .orElseThrow(() -> new RuntimeException("Project Member not found in the project"));
+        projectMemberRepository.delete(projectMember);
+    }
 }

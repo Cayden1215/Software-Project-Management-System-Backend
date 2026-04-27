@@ -27,5 +27,5 @@ public class SprintDto {
     
     private String sprintStatus;
 
-    private Project project;
+    private Long project;
 }

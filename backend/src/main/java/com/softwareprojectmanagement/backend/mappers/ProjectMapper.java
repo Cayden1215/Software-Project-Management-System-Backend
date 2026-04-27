@@ -14,7 +14,8 @@ public class ProjectMapper {
             project.getStartDate(),
             project.getDeadline(),
             project.getProjectStatus(),
-            project.getProjectManager().getUserID()
+            project.getProjectManager().getUserID(),
+            project.getTasks().stream().map(TaskMapper::mapToTaskDto).toList()
         );
     }
 

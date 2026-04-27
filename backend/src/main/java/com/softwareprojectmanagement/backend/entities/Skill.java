@@ -2,6 +2,9 @@ package com.softwareprojectmanagement.backend.entities;
 
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -11,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -36,6 +40,15 @@ public class Skill {
     @ManyToOne
     @JoinColumn(name = "projectID", nullable = false)
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
+
+    @ManyToMany(mappedBy = "skills")
+    @JsonIgnore
+    private List<Task> tasks;
+
+    @ManyToMany(mappedBy = "skills")
+    @JsonIgnore
+    private List<ProjectMember> projectMembers;
 
 }

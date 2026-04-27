@@ -36,4 +36,6 @@ public interface ProjectService {
 
     public List<TaskAssignmentDto> getProjectTaskAssignments(Long projectId);
 
+    public void removeTeamMemberFromProject(Long projectId, Long teamMemberId);
+
 }
