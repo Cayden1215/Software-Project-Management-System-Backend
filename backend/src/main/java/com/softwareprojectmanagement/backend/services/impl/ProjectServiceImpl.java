@@ -119,8 +119,9 @@ public class ProjectServiceImpl implements ProjectService{
     }
 
     @Override
-    public List<ProjectDto> getAllEnrolledProjects(Long tmID){
-        List<ProjectMember> projectMembers = projectMemberRepository.findByTeamMemberUserID(tmID);
+    public List<ProjectDto> getEnrolledProjects(String tmEmail){
+        TeamMember teamMember = teamMemberRepository.findByEmail(tmEmail).orElseThrow(() -> new RuntimeException("Team Member not found"));
+        List<ProjectMember> projectMembers = projectMemberRepository.findByTeamMemberUserID(teamMember.getUserID());
 
         return projectMembers.stream().map(pm -> ProjectMapper.mapToProjectDto(pm.getProject())).toList();
     }

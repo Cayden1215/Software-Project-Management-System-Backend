@@ -113,6 +113,8 @@ public class TaskServiceImpl implements TaskService {
                 .filter(s -> s.getSprintID().equals(taskDto.getSprintID()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Sprint with ID " + taskDto.getSprintID() + " not found in project")));
+        }else{
+            task.setSprint(null);
         }
 
         // Validate and set dependencies if provided

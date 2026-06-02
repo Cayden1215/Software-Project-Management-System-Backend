@@ -33,19 +33,20 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
             .authorizeHttpRequests(auth -> auth
                 // Allow anyone to access the login/register endpoints
-                .requestMatchers("/api/auth/**","/v3/api-docs",
+                .requestMatchers("/api/auth/**",
+                "/v3/api-docs",
                 "/v3/api-docs.yaml",
                 "/swagger-ui/**",
                 "/swagger-ui.html").permitAll()
                 
                 // Only Project Managers can manage projects
-                .requestMatchers("/api/projects/**").hasRole("PROJECT_MANAGER")
+                .requestMatchers("/api/v1/projects/**").hasAnyRole("PROJECT_MANAGER", "TEAM_MEMBER")
                 
                 // Only Project Managers can access scheduling endpoints
                 .requestMatchers("/api/v1/scheduling/**").hasRole("PROJECT_MANAGER")
                 
                 // Both roles can interact with tasks
-                .requestMatchers("/api/tasks/**").hasAnyRole("PROJECT_MANAGER", "TEAM_MEMBER")
+                .requestMatchers("/api/v1/tasks/**").hasAnyRole("PROJECT_MANAGER", "TEAM_MEMBER")
                 
                 // Any other request must be authenticated
                 .anyRequest().authenticated()

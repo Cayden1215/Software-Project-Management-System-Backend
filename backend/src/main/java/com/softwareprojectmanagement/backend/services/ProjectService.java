@@ -26,7 +26,7 @@ public interface ProjectService {
 
     public List<ProjectDto> getAllProjects(String pmEmail);
 
-    public List<ProjectDto> getAllEnrolledProjects(Long tmID);
+    public List<ProjectDto> getEnrolledProjects(String tmEmail);
 
     public void enrollTeamMemberToProject(Long projectId,ProjectMemberDto projectMemberDto);
 

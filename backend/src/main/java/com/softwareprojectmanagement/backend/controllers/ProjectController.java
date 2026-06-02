@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,6 +34,7 @@ public class ProjectController {
 
     private ProjectService projectService;
 
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
     @PostMapping
     public ResponseEntity<ProjectDto> createProject(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ProjectDto projectDto) {
 
@@ -47,6 +49,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(foundProjectDto);
     }
 
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
     @PutMapping("/{id}")
     public ResponseEntity<ProjectDto> updateProject(@PathVariable Long id, @RequestBody ProjectDto projectDto) {
         projectDto.setProjectID(id);
@@ -54,18 +57,28 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedProjectDto);
     }
 
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
     @GetMapping
     public ResponseEntity<List<ProjectDto>> getAllProjects(@AuthenticationPrincipal UserDetails userDetails) {
         List<ProjectDto> projectDtos = projectService.getAllProjects(userDetails.getUsername());
         return ResponseEntity.ok(projectDtos);
     }
 
+    @PreAuthorize("hasRole('TEAM_MEMBER')")
+    @GetMapping("/enrolled")
+    public ResponseEntity<List<ProjectDto>> getEnrolledProjects(@AuthenticationPrincipal UserDetails userDetails) {
+        List<ProjectDto> projectDtos = projectService.getEnrolledProjects(userDetails.getUsername());
+        return ResponseEntity.ok(projectDtos);
+    }
+
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
     @PostMapping("/{id}/enroll")
     public ResponseEntity<Void> enrollTeamMemberToProject(@PathVariable Long id, @RequestBody ProjectMemberDto projectMemberDto) {
         projectService.enrollTeamMemberToProject(id, projectMemberDto);

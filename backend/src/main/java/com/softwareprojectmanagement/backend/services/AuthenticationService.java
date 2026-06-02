@@ -39,6 +39,6 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         
         // 4. Return the token wrapped in our DTO
-        return new AuthenticationResponse(jwtToken);
+        return new AuthenticationResponse(jwtToken, user.getRole().name());
     }
 }
